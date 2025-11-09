@@ -127,7 +127,7 @@ socket.on("connect" , ()=>{
 socket.on("message" , (message)=>{
     setChats(prev => [...prev  , message[message]]) ;
     if(selectedUser._id === message[message].senderId ) {
-        const audio = new Audio('/notif.mp3');
+        const audio = new Audio('/notif.WAV');
 audio.play();
     }
     else {
