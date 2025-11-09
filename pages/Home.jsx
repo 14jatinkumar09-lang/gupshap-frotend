@@ -125,22 +125,22 @@ socket.on("connect" , ()=>{
 })
 
 socket.on("message" , (messages)=>{
-    setChats(prev => [...prev  , messages[newMessage]]) ;
-    if(selectedUser._id === messages[newMessage].senderId ) {
+    setChats(prev => [...prev  , messages.message]) ;
+    if(selectedUser._id === messages.message.senderId ) {
         const audio = new Audio('/notif.WAV');
 audio.play();
     }
     else {
-        toast(messages[sender].fullName , "sent a new Message") ;
+        toast(messages.sender.fullName , "sent a new Message") ;
         
 audio.play();
     }
 
 
      if(Notification.permission === "granted") {
-    new Notification(messages[sender].fullName, {
-      body: messages[newMessage].messages,
-      icon: messages[sender].avatar ,
+    new Notification(messages.sender.fullName, {
+      body: messages.message.messages,
+      icon: messages.sender.avatar ,
     });
   }
 
