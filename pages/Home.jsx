@@ -130,7 +130,7 @@ socket.on("message" , (message)=>{
 if(!socket) return ;
 socket.on("onlineUsers" , (OnlineUsers)=>{
     
-    setOnlineUsers( prev => OnlineUsers) ;
+    setOnlineUsers(  OnlineUsers) ;
 
 } )
 
