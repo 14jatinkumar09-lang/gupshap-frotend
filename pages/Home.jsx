@@ -120,8 +120,8 @@ socket.on("connect" , ()=>{
 
 })
 
-socket.on("message" , (messages)=>{
-    setChats(prev => [...prev  , messages.message]) ;    
+socket.on("message" , (message)=>{
+    setChats(prev => [...prev  , message]) ;    
 })
 
 
@@ -130,7 +130,7 @@ socket.on("message" , (messages)=>{
 if(!socket) return ;
 socket.on("onlineUsers" , (OnlineUsers)=>{
     
-    setOnlineUsers(OnlineUsers) ;
+    setOnlineUsers( OnlineUsers) ;
 
 } )
 
