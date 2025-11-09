@@ -121,7 +121,7 @@ socket.on("connect" , ()=>{
 })
 
 socket.on("message" , (message)=>{
-    setChats(prev => [...prev  , message]) ;    
+    setChats(prev => [...prev  , message.message]) ;    
 })
 
 
