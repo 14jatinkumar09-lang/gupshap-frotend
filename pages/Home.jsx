@@ -130,19 +130,18 @@ socket.on("message" , (message)=>{
 if(!socket) return ;
 socket.on("onlineUsers" , (OnlineUsers)=>{
     
-    setOnlineUsers( OnlineUsers) ;
-    return () => {
+    setOnlineUsers( prev => OnlineUsers) ;
+    
+} )
+return () => {
         // socket.off("onlineUsers");
         socket.close() ;
         
         
     }
-    
-    
-    
-    
-    
-} )
+
+
+
 },[]) ;
 
 // console.log("array of all online users" , onlineUsers) ;
