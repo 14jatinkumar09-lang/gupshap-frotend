@@ -137,7 +137,7 @@ socket.on("onlineUsers" , (OnlineUsers)=>{
 
     return () => {
         // socket.off("onlineUsers");
-        socket.close() ;
+        socket.disconnect() ;
         
         
     }
