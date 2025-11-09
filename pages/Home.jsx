@@ -224,7 +224,7 @@ return <div className="flex flex-col items-center sm:flex-row " >
             catch (error) {
                 // console.log(error);
             }
-                        }, 100);
+                        }, 500);
                         
 
                     }}
