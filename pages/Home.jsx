@@ -125,8 +125,8 @@ socket.on("connect" , ()=>{
 })
 
 socket.on("message" , (messages)=>{
-    setChats(prev => [...prev  , messages[message]]) ;
-    if(selectedUser._id === messages[message].senderId ) {
+    setChats(prev => [...prev  , messages[newMessage]]) ;
+    if(selectedUser._id === messages[newMessage].senderId ) {
         const audio = new Audio('/notif.WAV');
 audio.play();
     }
@@ -139,7 +139,7 @@ audio.play();
 
      if(Notification.permission === "granted") {
     new Notification(messages[sender].fullName, {
-      body: messages[message].messages,
+      body: messages[newMessage].messages,
       icon: messages[sender].avatar ,
     });
   }
