@@ -131,18 +131,16 @@ if(!socket) return ;
 socket.on("onlineUsers" , (OnlineUsers)=>{
     
     setOnlineUsers( OnlineUsers) ;
+
+} )
+
+
     return () => {
         // socket.off("onlineUsers");
         socket.close() ;
         
         
     }
-    
-    
-    
-    
-    
-} )
 },[]) ;
 
 // console.log("array of all online users" , onlineUsers) ;
