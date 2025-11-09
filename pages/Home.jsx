@@ -93,11 +93,7 @@ const focusInput = () => {
 
 
 
-useEffect(() => {
-  if (Notification.permission !== "granted") {
-    Notification.requestPermission();
-  }
-}, []);
+
 
 useEffect(()=>{
 
@@ -125,28 +121,7 @@ socket.on("connect" , ()=>{
 })
 
 socket.on("message" , (messages)=>{
-    setChats(prev => [...prev  , messages.message]) ;
-    if(selectedUser._id === messages.message.senderId ) {
-        const audio = new Audio('/notif.WAV');
-audio.play();
-    }
-    else {
-        toast(messages.sender.fullName , "sent a new Message") ;
-        
-audio.play();
-    }
-
-
-     if(Notification.permission === "granted") {
-    new Notification(messages.sender.fullName, {
-      body: messages.message.messages,
-      icon: messages.sender.avatar ,
-    });
-  }
-
-    
-
-    
+    setChats(prev => [...prev  , messages.message]) ;    
 })
 
 
@@ -224,7 +199,7 @@ return <div className="flex flex-col items-center sm:flex-row " >
             catch (error) {
                 // console.log(error);
             }
-                        }, 500);
+                        }, 100);
                         
 
                     }}
