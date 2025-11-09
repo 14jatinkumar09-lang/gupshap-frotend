@@ -124,23 +124,23 @@ socket.on("connect" , ()=>{
 
 })
 
-socket.on("message" , (message)=>{
-    setChats(prev => [...prev  , message[message]]) ;
-    if(selectedUser._id === message[message].senderId ) {
+socket.on("message" , (messages)=>{
+    setChats(prev => [...prev  , messages[message]]) ;
+    if(selectedUser._id === messages[message].senderId ) {
         const audio = new Audio('/notif.WAV');
 audio.play();
     }
     else {
-        toast(message[sender].fullName , "sent a new Message") ;
+        toast(messages[sender].fullName , "sent a new Message") ;
         
 audio.play();
     }
 
 
      if(Notification.permission === "granted") {
-    new Notification(message[sender].fullName, {
-      body: message[message].messages,
-      icon: message[sender].avatar ,
+    new Notification(messages[sender].fullName, {
+      body: messages[message].messages,
+      icon: messages[sender].avatar ,
     });
   }
 
