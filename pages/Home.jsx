@@ -103,7 +103,7 @@ const s = useRecoilValue(socketio);
   
   
   useEffect(()=>{
-if (s) return;
+if (!s) return;
        if(!localStorage.getItem("token")) {
           navigate("/login") ;
           return ;
