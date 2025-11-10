@@ -10,6 +10,7 @@ import {allChats, allUsers, btnLoading, current_2nd_user, loggedInUser ,msgBlink
 
 
 import { io } from 'socket.io-client' ;
+import { socketio } from "../store/ConversationUser";
 
 
 
@@ -85,43 +86,50 @@ const focusInput = () => {
     inputRef.current.value = "" ; 
     setIsSearching(false) ;
     // like document.getElementById(...)
-  };
+};
 
-  const socket = useRef( null ) ;
-  const audio = useRef(null) ;
+const audio = useRef(null) ;
+
+const s = useRecoilValue(socketio);
+  
+  
+  
+  /////////////////////////////////////////////////
 
 
   
+  
+  
+  
+  
+  useEffect(()=>{
+if (!s) return;
+       if(!localStorage.getItem("token")) {
+          navigate("/login") ;
+          return ;
+        }
 
-/////////////////////////////////////////////////
+    
 
-
-
-
-
-
-
-useEffect(()=>{
-
-    if(!localStorage.getItem("token")) {
-        navigate("/login") ;
-        
-    }
 Notification.requestPermission().then(permission => {
   console.log("Permission:", permission); // "granted", "denied", or "default"
 });
 
-function showNotification(title, options) {
+function showNotification(title, options ,sender) {
   if (Notification.permission === "granted") {
     new Notification(title, options).onclick = (e) =>{
     e.preventDefault();
 
+    setSelectedUser(sender) ;
     window.focus() ;
     // window.open() ;
   }
   }
 
 }
+ 
+
+
 
 
 
@@ -131,39 +139,36 @@ function showNotification(title, options) {
 
     
 
-socket.current = io(import.meta.env.VITE_DB_ORIGIN_URL , 
-    {
-        query : {
-            _id : loginUser?._id  ,
-        }
-    }
-)
 
 
 
-socket.current.on("connect" , ()=>{
- 
+
+s.on("connect" , ()=>{
+ console.log("Socket Connected:", s.id);
 //   console.log("ID:", socket.id);
 //   console.log("Status:", socket.connected);
 
 })
 
-socket.current.on("message" , (message)=>{
+s.on("message" , (message)=>{
 
     
     audio.current.play() ;
 
+        
+    
+    console.log(message?.newMessage?.senderId , ":" , selectedUser?._id );
+    if(message?.newMessage?.senderId !== selectedUser?._id) {
          try {
 showNotification("GupShap", {
     body: `${message?.sender?.fullName} \nSent You a Message\n  ${message?.newMessage?.messages} `|| "You have a new message",
     icon: message?.sender?.avatar ,
-  });
+  } , message?.sender);
     } catch (error) {
         console.log(error);
     }
-    
-    // console.log(message?.newMessage?.senderId , ":" , selectedUser?._id );
-    if(message?.newMessage?.senderId !== selectedUser?._id) {return ;}
+        return ;
+    }
     setChats(prev => [...prev  , message?.newMessage]) ;  
     
     
@@ -174,24 +179,26 @@ showNotification("GupShap", {
 
 
 
-if(!socket.current) return ;
-socket.current.on("onlineUsers" , (OnlineUsers)=>{
+
+s.on("onlineUsers" , (OnlineUsers)=>{
     
-    setOnlineUsers( prev => OnlineUsers) ;
+    setOnlineUsers( OnlineUsers) ;
     
 } )
 
 
 return () => {
         // socket.off("onlineUsers");
-        socket.current.close() ;
+        s.off("message");
+  s.off("onlineUsers");
+  
         
         
-    }
+    };
 
 
 
-},[selectedUser]) ;
+},[s , selectedUser]) ;
 
 // console.log("array of all online users" , onlineUsers) ;
 
