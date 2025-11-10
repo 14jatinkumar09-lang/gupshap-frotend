@@ -96,7 +96,7 @@ export const msgBlink = atom({
 export const socketio = atom({
     key:"socket" ,
     default :  null ,
-dangerouslyAllowMutability: true, 
+// dangerouslyAllowMutability: true, 
 })
 
 
