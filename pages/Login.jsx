@@ -8,13 +8,15 @@ import axios from 'axios' ;
 import toast, { Toaster } from 'react-hot-toast';
 import {  btnLoading, loggedInUser } from '../store/ConversationUser';
 import { useRecoilState, useSetRecoilState } from 'recoil';
+import { socketio } from "../store/ConversationUser";
+import { createSocket } from "../src/socket.js"
 
 
 export function Login () {
     const [btnLoad , setBtnLoad] = useRecoilState(btnLoading) ;
     const [userName,setuserName] = useState("") ;
     const [password,setPassword]  = useState("")  ;
-
+    const setSocket = useSetRecoilState(socketio);
     const login = async()=>{
         if(userName==="" || password==="") {
             toast("enter user / password")
@@ -31,9 +33,11 @@ export function Login () {
                         
 
                         
+                        navigate('/home') ;
                        setBtnLoad(false) ; 
                         localStorage.setItem("token" , res.data.responseData.token) ;
-                        navigate('/home') ;
+                        const s = createSocket(user._id);
+    setSocket(s);
                     } catch (error) {
                         
                         
