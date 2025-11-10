@@ -31,8 +31,8 @@ export function Login () {
                         toast.success("logged in ")
                         localStorage.setItem("_id" , res.data.responseData.userExist._id) ;
                         
-                     const s = createSocket(!localStorage.getItem("_id"));
-    setSocket(s);
+    //                  const s = createSocket(!localStorage.getItem("_id"));
+    // setSocket(s);
 
                         
                         navigate('/home') ;
