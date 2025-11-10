@@ -100,6 +100,7 @@ const [s , setS]= useRecoilState(socketio);
    useEffect(()=>{
        const s = createSocket(localStorage.getItem('_id'));
     setS(s);
+       console.log("socket inside") ;
 
    } , [])
   
