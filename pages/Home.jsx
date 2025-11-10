@@ -102,6 +102,9 @@ const focusInput = () => {
 
 
 useEffect(()=>{
+    if(!loginUser?._id) {
+        return ;
+    }
 
     if(!localStorage.getItem("token")) {
         navigate("/login") ;
