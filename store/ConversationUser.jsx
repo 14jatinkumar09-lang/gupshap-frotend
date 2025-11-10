@@ -1,7 +1,7 @@
 import { atom, selector, useRecoilValue } from 'recoil';
 import axios from 'axios'
-
-
+import { useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client' ;
 // const navigate = useNavigate() ;
 
 
@@ -29,7 +29,12 @@ export const allUsers = atom({
 })
 
 
+export const current_2nd_user = atom({
+    key: "currentfe user",
+    default: {}
 
+
+})
 
 
 
@@ -70,12 +75,7 @@ export const allChats = atom ( {
     key : "socket new message recieved" ,
     default : [] ,
 })
-export const current_2nd_user = atom({
-    key: "currentfe user",
-    default: {}
 
-
-})
 
 export const btnLoading = atom({
     key : "btnload" ,
@@ -93,5 +93,21 @@ export const msgBlink = atom({
 
 
 
+export const socketio = atom({
+    key:"socket" ,
+    default :  null ,
+dangerouslyAllowMutability: true, 
+})
 
 
+// export const socketio = atom({
+//     key:"socket" ,
+//     default :  io(import.meta.env.VITE_DB_ORIGIN_URL , 
+//     {
+//         query : {
+//             _id : localStorage.getItem("_id") ,
+//         }
+//     }
+// ) ,
+// dangerouslyAllowMutability: true, 
+// })
