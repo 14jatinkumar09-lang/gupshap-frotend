@@ -166,7 +166,7 @@ s.on("message" , (message)=>{
     if(message?.newMessage?.senderId !== selectedUser?._id) {
          try {
 showNotification("GupShap", {
-    body: `${message?.sender?.fullName} \nSent You a Message\n  ${message?.newMessage?.messages} `|| "You have a new message",
+    body: `${message?.sender?.fullName} \nSent You a Message\n${message?.newMessage?.messages} `|| "You have a new message",
     icon: message?.sender?.avatar ,
   } , message?.sender);
     } catch (error) {
@@ -187,7 +187,7 @@ showNotification("GupShap", {
 
 s.on("onlineUsers" , (OnlineUsers)=>{
 
-    setOnlineUsers( prev => OnlineUsers) ;
+    setOnlineUsers( OnlineUsers) ;
     
 } )
 
