@@ -1,353 +1,96 @@
-import { FaUserCircle } from "react-icons/fa";
-import { UserCard } from "../components/UserCard";
-import { ChatBox } from "../components/ChatBox";
-import { useNavigate } from "react-router-dom";
-import { useState , useRef, useEffect } from 'react' ;
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import dotenv from 'dotenv' ;
+
+import { InputBox } from "../components/InputBox"
+import { Button } from "../components/Button" 
+import { useNavigate } from "react-router-dom"
+import { useState } from 'react' ;
 import axios from 'axios' ;
 import toast, { Toaster } from 'react-hot-toast';
-import {allChats, allUsers, btnLoading, current_2nd_user, loggedInUser ,msgBlink,onlineUsersArr} from '../store/ConversationUser' ;
-
-
-import { io } from 'socket.io-client' ;
+import {  btnLoading, loggedInUser } from '../store/ConversationUser';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { socketio } from "../store/ConversationUser";
+import { createSocket } from "../src/socket.js"
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-export function Home() {
-    
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const [onlineUsers , setOnlineUsers] = useRecoilState(onlineUsersArr) ;
-
-
-const inputRef = useRef(null);
-    const [users,setUsers] = useRecoilState(allUsers) ;
-    const [filterUsers , setFilterUsers] = useState([]) ;
-        
-const navigate = useNavigate() ;
-const [userSearch , setUserSearch] = useState("") ;
-const [selectedUser,setSelectedUser] = useRecoilState(current_2nd_user) ; 
-const loginUser = useRecoilValue(loggedInUser) ;
-const [isSearching , setIsSearching] = useState(false) ;
-const [chats , setChats] = useRecoilState(allChats) ;
-const [btnLoad , setBtnLoad] = useRecoilState(btnLoading) ;
-// console.log("chatting chats",chats);
-const [blink,setBlink ]= useRecoilState(msgBlink) ;
-
-const focusInput = () => {
-    inputRef.current.value = "" ; 
-    setIsSearching(false) ;
-    // like document.getElementById(...)
-};
-
-const audio = useRef(null) ;
-
-const s = useRecoilValue(socketio);
-  
-  
-  
-  /////////////////////////////////////////////////
-
-
-  
-  
-  
-  
-  
-  useEffect(()=>{
-if (!s) return;
-       if(!localStorage.getItem("token")) {
-          navigate("/login") ;
-          return ;
+export function Login () {
+    const [btnLoad , setBtnLoad] = useRecoilState(btnLoading) ;
+    const [userName,setuserName] = useState("") ;
+    const [password,setPassword]  = useState("")  ;
+    const setSocket = useSetRecoilState(socketio);
+    const login = async()=>{
+        if(userName==="" || password==="") {
+            toast("enter user / password")
+            return ;
         }
+                    try {
+                        setBtnLoad(true)  ;
 
-    
-
-Notification.requestPermission().then(permission => {
-  console.log("Permission:", permission); // "granted", "denied", or "default"
-});
-
-function showNotification(title, options ,sender) {
-  if (Notification.permission === "granted") {
-    new Notification(title, options).onclick = (e) =>{
-    e.preventDefault();
-
-    setSelectedUser(sender) ;
-    window.focus() ;
-    // window.open() ;
-  }
-  }
-
-}
- 
-
-
-
-
-
-
-    audio.current = new Audio('/notif.wav');  
-    
-
-    
-
-
-
-
-
-s.on("connect" , ()=>{
- console.log("Socket Connected:", s.id);
-//   console.log("ID:", socket.id);
-//   console.log("Status:", socket.connected);
-
-})
-
-s.on("message" , (message)=>{
-
-    
-    audio.current.play() ;
-
-        
-    
-    console.log(message?.newMessage?.senderId , ":" , selectedUser?._id );
-    if(message?.newMessage?.senderId !== selectedUser?._id) {
-         try {
-showNotification("GupShap", {
-    body: `${message?.sender?.fullName} \nSent You a Message\n  ${message?.newMessage?.messages} `|| "You have a new message",
-    icon: message?.sender?.avatar ,
-  } , message?.sender);
-    } catch (error) {
-        console.log(error);
-    }
-        return ;
-    }
-    setChats(prev => [...prev  , message?.newMessage]) ;  
-    
-    
-   
-
-})
-
-
-
-
-
-s.on("onlineUsers" , (OnlineUsers)=>{
-    
-    setOnlineUsers( OnlineUsers) ;
-    
-} )
-
-
-return () => {
-        // socket.off("onlineUsers");
-        s.off("message");
-  s.off("onlineUsers");
-  
-        
-        
-    };
-
-
-
-},[s , selectedUser]) ;
-
-// console.log("array of all online users" , onlineUsers) ;
-
-
-
-
-//////////////////////////////////////////////////
-
-// console.log("chatss" , chats);
-
-
-return <div className="flex flex-col items-center sm:flex-row " >
-        
-{/* hidden sm:block */}
-        <div className="part1 sm:h-screen sm:w-[35vw]  h-[50vh] w-[80vw] xl:w-[50vw] lg:w-[50vw]  md:w-[50vw] border-2 border-white/10 flex flex-col justify-between">
-
-            <div className="bg-gray-600  h-10 flex  justify-center items-center font-bold">
-                <div>GupShap</div>
-            </div>
-            <div className=" h-10 w-full ">
-                <label className="input validator w-full ">
-                    <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <g
-                            strokeLinejoin="round"
-                            strokeLinecap="round"
-                            strokeWidth="2.5"
-                            fill="none"
-                            stroke="currentColor"
-                        >
-                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </g>
-                    </svg>
-                    <input ref={inputRef}
-                    onChange={async (e)=>{
-                        setUserSearch(e.target.value) ;
-                        if(userSearch === "") {
-                            setIsSearching(false) ;
-                            return ;
-                        }
-                
-                        setTimeout(async() => {
-                            
-                            try {
-                const res = await axios.get(`${import.meta.env.VITE_URL}/user/filterUserSearch?filter=${userSearch}`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                }
-            });
-            setIsSearching(true) ;
-            // console.log(isSearching);
-            setFilterUsers( Object.values(res.data.responseData.users) ) ; 
-
-            } 
-            catch (error) {
-                // console.log(error);
-            }
-                        }, 100);
+                        const res =  await axios.post( `${import.meta.env.VITE_URL}/user/login` , {
+                            userName,password
+                        })
+                        toast.success("logged in ")
+                        localStorage.setItem("_id" , res.data.responseData.userExist._id) ;
                         
+                        const s = createSocket(res.data.responseData.userExist._id);
+    setSocket(s);
 
-                    }}
-                        type="text"
-                        required
-                        placeholder="Username"
-                        pattern="[A-Za-z][A-Za-z0-9\-]*"
-                        minlength="3"
-                        maxlength="30"
-                        title="Only letters, numbers or dash"
-                    />
-                </label>
+                        
+                        navigate('/home') ;
+                       setBtnLoad(false) ; 
+                        localStorage.setItem("token" , res.data.responseData.token) ;
+                    } catch (error) {
+                        
+                        
+                        toast.error(error.response.data.errMessage) ;
+                        setBtnLoad(false) ; 
 
-            </div>
-            <div className="my-2 overflow-y-scroll h-full border-2 border-white/10 ">
-                {(isSearching ? filterUsers : users)?.map((user) => {
-                    if(isSearching) {
-                        if(user._id === selectedUser._id) return ;
                     }
-                    return user?.userName !== loginUser?.userName  ? <UserCard key={user._id} user={user} onClick={() => { 
-                        setSelectedUser(user) ;
-                        focusInput() ;
-                        let once = ()=>{
-                            if(Object.keys(selectedUser).length === 0) {
-                                return;
-                            }
-                            setUsers([ selectedUser , ... users  ]) ;
-                            once = ()=>{} ;
-                        }
-                        isSearching ? once(): null ;
+                }
+    
+    
+const navigate = useNavigate() ;
+return <div className="flex justify-center p-10">
+    
+    
+            <div className="border-2 border-gray-200 w-110 text-center rounded-md shadow-2xl">
+                <h1 className="font-bold text-xl m-2">Welcome Back</h1>
+                <div>Enter your credentials to access your account </div>
+                <InputBox onKeyDown={(e)=>{
+                    if(e.key === "Enter") {
+                        login() ;
+                    }
+                }}
+                onChange={(e)=>{
+                    setuserName(e.target.value) ;
+                }} type={'text'} placeholder={"you@example..com"} label={"UserName"} />
+                <InputBox onKeyDown={(e)=>{
+                    if(e.key === "Enter") {
+                        login() ;
+                    }
+                }}
+                onChange={(e)=>{
+                    setPassword(e.target.value) ;
+                }} type={'password'} placeholder={". . . . . . . . "} label={"Password"} />
 
-                    }} /> : ""
-                })}
-            </div>
-            <button className=" h-20 text-blue-300 text-center hidden gap-10 items-center px-5 hover:cursor-pointer sm:block sm:flex justify-center text-2xl font-bold" 
-            onClick={()=>{
-                setSelectedUser(loginUser) ;
-                navigate("/profileUpdate") ;
-            }}>
+                <div className="m-6">
+                    
+        { !btnLoad ? <button className={` border w-full rounded-md py-2 text-white bg-blue-500 hover:cursor-pointer`}
+           onClick={login} >
+            Login
 
-                 <div>
-                    <div className="avatar avatar-online">
-  <div className="w-10 rounded-full">
-    <img src={loginUser?.avatar} />
-  </div>
-</div>
-                 </div>
-<div >{loginUser?.fullName}</div>
-            </button>
-            {/* <div className="hidden">{toast.success("logged in")} <Toaster /></div> */}
+        </button> : 
+<button class="btn">
+  <span class="loading loading-spinner"></span>
+  loading
+</button>
 
-        </div>
-        
-
-        <div className="part2 border border-white/10 w-full sm:h-screen  h-[50vh] " >
-        
-<ChatBox user={selectedUser}  />
-
-
-             </div>
-            
-
-
+         }<Toaster />
     </div>
+                
+                <h1 className="m-3 ">Don't have an account? <button className="text-blue-700 font-medium hover:cursor-pointer" onClick={()=>{navigate('/signup')}}>Sign Up</button></h1>
+
+            </div>
+            
+            
+</div>
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// try {
-//                                 const res = await axios.get(`${import.meta.env.VITE_URL}user/filterUserSearch?filter=${userSearch}` , {
-//                 headers: {
-//                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
-//                 }
-//             }) ;
-//                         setUsers(res.data.responseData.users) ;
-//                         console.log(res.data.responseData.users) ;
-                        
-
-                                
-//                             } catch (error) {
-//                                 console.log(error) ;
-//                             }
