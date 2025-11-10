@@ -7,7 +7,7 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import axios from 'axios' ;
 import toast, { Toaster } from 'react-hot-toast';
 import {allChats, allUsers, btnLoading, current_2nd_user, loggedInUser ,msgBlink,onlineUsersArr} from '../store/ConversationUser' ;
-
+import { createSocket } from "../src/socket.js"
 
 import { io } from 'socket.io-client' ;
 import { socketio } from "../store/ConversationUser";
@@ -90,14 +90,18 @@ const focusInput = () => {
 
 const audio = useRef(null) ;
 
-const s = useRecoilValue(socketio);
+const [s , setS]= useRecoilState(socketio);
   
   
   
   /////////////////////////////////////////////////
 
 
-  
+   useEffect(()=>{
+       const s = createSocket(res.data.responseData.userExist._id);
+    setS(s);
+
+   } , [])
   
   
   
