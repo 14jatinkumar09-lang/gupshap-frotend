@@ -142,7 +142,7 @@ useEffect(() => {
         socket.current = null;
         console.log("Socket disconnected");
     };
-}, [loginUser?._id]); // only run when loginUser loads
+}, []); // only run when loginUser loads
 // Added necessary dependencies
 
 // console.log("array of all online users" , onlineUsers) ;
