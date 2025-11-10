@@ -130,12 +130,12 @@ useEffect(() => {
 
     // 3. Socket Connection
     // Check if the user is logged in before connecting
-    if (!loginUser?._id) return;
+    // if (!loginUser?._id) return;
     
     // Disconnect any existing socket before creating a new one (Optional, but safer for re-runs)
-    if (socket.current) {
-        socket.current.disconnect();
-    }
+    // if (socket.current) {
+    //     socket.current.disconnect();
+    // }
     
     socket.current = io(import.meta.env.VITE_DB_ORIGIN_URL,
         {
@@ -185,7 +185,7 @@ useEffect(() => {
         }
     };
 
-}, [loginUser?._id, navigate, selectedUser?._id, setChats, setOnlineUsers]); // Added necessary dependencies
+}, [loginUser?._id, navigate, selectedUser?._id]); // Added necessary dependencies
 
 // console.log("array of all online users" , onlineUsers) ;
 
