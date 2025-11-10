@@ -98,7 +98,7 @@ const [s , setS]= useRecoilState(socketio);
 
 
    useEffect(()=>{
-       const s = createSocket(res.data.responseData.userExist._id);
+       const s = createSocket(localStorage.getItem('_id'));
     setS(s);
 
    } , [])
