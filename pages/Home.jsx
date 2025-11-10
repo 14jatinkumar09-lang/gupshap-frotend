@@ -191,6 +191,7 @@ return () => {
         // socket.off("onlineUsers");
         s.off("message");
   s.off("onlineUsers");
+    s.disconnect() ;
   
         
         
