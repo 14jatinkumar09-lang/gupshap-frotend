@@ -184,7 +184,7 @@ socket.current.on("onlineUsers" , (OnlineUsers)=>{
 
 return () => {
         // socket.off("onlineUsers");
-        socket.current.disconnect() ;
+        socket.current.close() ;
         
         
     }
