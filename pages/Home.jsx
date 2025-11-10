@@ -102,9 +102,9 @@ const focusInput = () => {
 
 
 useEffect(()=>{
-    if(!loginUser?._id) {
-        return ;
-    }
+    // if(!loginUser?._id) {
+    //     return ;
+    // }
     // if (socket.current && socket.current.connected) return;
 
     if(!localStorage.getItem("token")) {
