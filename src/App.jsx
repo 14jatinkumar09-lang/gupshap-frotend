@@ -21,6 +21,8 @@ import { io } from 'socket.io-client' ;
 function App() {
   const loginUser = useRecoilValue(loggedInUser) ;
   const setSocket = useSetRecoilState(socketio) ;
+    const navigate = useNavigate() ;
+
   
 
 useEffect(()=>{
