@@ -93,21 +93,21 @@ export const msgBlink = atom({
 
 
 
-export const socketio = atom({
-    key:"socket" ,
-    default :  null ,
-dangerouslyAllowMutability: true, 
-})
-
-
 // export const socketio = atom({
 //     key:"socket" ,
-//     default :  io(import.meta.env.VITE_DB_ORIGIN_URL , 
-//     {
-//         query : {
-//             _id : localStorage.getItem("_id") ,
-//         }
-//     }
-// ) ,
+//     default :  null ,
 // dangerouslyAllowMutability: true, 
 // })
+
+
+export const socketio = atom({
+    key:"socket" ,
+    default :  io(import.meta.env.VITE_DB_ORIGIN_URL , 
+    {
+        query : {
+            _id : localStorage.getItem("_id") ,
+        }
+    }
+) ,
+dangerouslyAllowMutability: true, 
+})
