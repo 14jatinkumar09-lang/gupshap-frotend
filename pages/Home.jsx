@@ -162,7 +162,7 @@ showNotification("GupShap", {
         console.log(error);
     }
     
-    // console.log(message?.newMessage?.senderId , ":" , selectedUser?._id );
+    console.log(message?.newMessage?.senderId , ":" , selectedUser?._id );
     if(message?.newMessage?.senderId !== selectedUser?._id) {return ;}
     setChats(prev => [...prev  , message?.newMessage]) ;  
     
@@ -191,7 +191,7 @@ return () => {
 
 
 
-},[selectedUser]) ;
+},[]) ;
 
 // console.log("array of all online users" , onlineUsers) ;
 
