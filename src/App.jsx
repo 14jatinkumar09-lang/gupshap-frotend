@@ -13,12 +13,36 @@ import { Profile } from '../pages/Profile.jsx';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { ProfileUpdate } from '../pages/ProfileUpdate.jsx';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { loggedInUser, socketio } from '../store/ConversationUser.jsx';
+import { io } from 'socket.io-client' ;
 
 
 function App() {
+  const loginUser = useRecoilValue(loggedInUser) ;
+  const setSocket = useSetRecoilState(socketio) ;
   
 
+useEffect(()=>{
+  if(!localStorage.getItem("token")) {
+          navigate("/login") ;
+          return ;
+        }
 
+       const s = io(import.meta.env.VITE_DB_ORIGIN_URL, {
+    query: { _id: localStorage.getItem("_id") },
+  });
+
+   setSocket(s);
+   
+   
+   return () => {
+         s.disconnect();
+       };
+
+
+     }, [loginUser]);
+    
 
   return <div>
 
