@@ -181,8 +181,8 @@ showNotification("GupShap", {
 
 
 s.on("onlineUsers" , (OnlineUsers)=>{
-    
-    setOnlineUsers( OnlineUsers) ;
+
+    setOnlineUsers( prev => OnlineUsers) ;
     
 } )
 
@@ -198,7 +198,7 @@ return () => {
 
 
 
-},[ selectedUser]) ;
+},[ s , selectedUser]) ;
 
 // console.log("array of all online users" , onlineUsers) ;
 
