@@ -198,7 +198,7 @@ return () => {
 
 
 
-},[s , selectedUser]) ;
+},[ selectedUser]) ;
 
 // console.log("array of all online users" , onlineUsers) ;
 
