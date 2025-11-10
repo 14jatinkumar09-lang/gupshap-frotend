@@ -103,10 +103,7 @@ export const msgBlink = atom({
 
 
 
-export const socketio = atom({
-    key:"socket" ,
-    default : "" ,
-})
+
 
     key: "existedUsers",
     default: selector({
