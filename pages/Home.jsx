@@ -192,7 +192,13 @@ socket.current.on("onlineUsers" , (OnlineUsers)=>{
 
 return () => {
         // socket.off("onlineUsers");
-        socket.current.disconnect() ;
+    if (socket.current) {
+            socket.current.off("message"); // Remove listeners
+            socket.current.off("onlineUsers");
+            socket.current.disconnect(); // Disconnect the socket
+            console.log("Socket disconnected.");
+        }
+        // socket.current.disconnect() ;
         
         
     }
