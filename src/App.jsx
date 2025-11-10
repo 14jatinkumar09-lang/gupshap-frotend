@@ -30,7 +30,7 @@ useEffect(()=>{
           navigate("/login") ;
           return ;
         }
-
+ if (!loginUser || !loginUser._id) return;
        const s = io(import.meta.env.VITE_DB_ORIGIN_URL, {
     query: { _id: localStorage.getItem("_id") },
   });
