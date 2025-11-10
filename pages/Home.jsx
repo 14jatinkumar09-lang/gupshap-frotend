@@ -105,7 +105,7 @@ useEffect(()=>{
     // if(!loginUser?._id) {
     //     return ;
     // }
-    // if (socket.current && socket.current.connected) return;
+    if (socket.current && socket.current.connected) return;
 
     if(!localStorage.getItem("token")) {
         navigate("/login") ;
