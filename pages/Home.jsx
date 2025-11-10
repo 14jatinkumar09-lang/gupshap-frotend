@@ -103,89 +103,47 @@ const focusInput = () => {
 
 // ... existing imports and state declarations
 
+    // 1. Authentication checkconst connectedRef = useRef(false);
+
 useEffect(() => {
-    // 1. Authentication check
+    if (connectedRef.current) return; // ⛔ prevent second run
+    connectedRef.current = true; // ✅ lock
+
     if (!localStorage.getItem("token")) {
         navigate("/login");
         return;
     }
 
-    // 2. Request Notification Permission (Good practice, keep it)
-    Notification.requestPermission().then(permission => {
-        console.log("Permission:", permission);
-    });
-
-    // Notification function (Keep it)
-    function showNotification(title, options) {
-        if (Notification.permission === "granted") {
-            new Notification(title, options).onclick = (e) => {
-                e.preventDefault();
-                window.focus();
-            };
-        }
-    }
-
-    // Audio setup (Keep it)
+    Notification.requestPermission();
     audio.current = new Audio('/notif.wav');
 
-    // 3. Socket Connection
-    // Check if the user is logged in before connecting
-    // if (!loginUser?._id) return;
-    
-    // Disconnect any existing socket before creating a new one (Optional, but safer for re-runs)
-    // if (socket.current) {
-    //     socket.current.disconnect();
-    // }
-    
-    socket.current = io(import.meta.env.VITE_DB_ORIGIN_URL,
-        {
-            query: {
-                _id: loginUser?._id,
-            }
-        }
-    );
+    socket.current = io(import.meta.env.VITE_DB_ORIGIN_URL, {
+        query: { _id: loginUser?._id }
+    });
 
-    // 4. Socket Listeners
     socket.current.on("connect", () => {
-        console.log("Socket connected, ID:", socket.current.id);
+        console.log("connected:", socket.current.id);
     });
 
     socket.current.on("message", (message) => {
-        audio.current.play();
-
-        try {
-            showNotification("GupShap", {
-                body: `${message?.sender?.fullName} \nSent You a Message\n  ${message?.newMessage?.messages}` || "You have a new message",
-                icon: message?.sender?.avatar,
-            });
-        } catch (error) {
-            console.log(error);
-        }
-
-        // Only update chats if the message is from the currently selected user
-        if (message?.newMessage?.senderId === selectedUser?._id) {
-             setChats(prev => [...prev, message?.newMessage]);
-        }
-        // Note: You might need logic here to update a message counter/indicator 
-        // for users who are *not* currently selected.
+        audio.current?.play().catch(()=>{});
+        setChats(prev => {
+            if (message?.newMessage?.senderId === selectedUser?._id) {
+                return [...prev, message?.newMessage];
+            }
+            return prev;
+        });
     });
 
-    socket.current.on("onlineUsers", (OnlineUsers) => {
-        setOnlineUsers(OnlineUsers);
-    });
+    socket.current.on("onlineUsers", setOnlineUsers);
 
-    // 5. Cleanup Function: The Crucial Part
     return () => {
-        // This runs on component unmount or before the effect runs again
-        if (socket.current) {
-            socket.current.off("message"); // Remove listeners
-            socket.current.off("onlineUsers");
-            socket.current.disconnect(); // Disconnect the socket
-            console.log("Socket disconnected.");
-        }
+        socket.current?.disconnect();
+        socket.current = null;
+        console.log("Socket disconnected");
     };
-
-}, [loginUser?._id, navigate, selectedUser?._id]); // Added necessary dependencies
+}, [loginUser?._id]); // only run when loginUser loads
+// Added necessary dependencies
 
 // console.log("array of all online users" , onlineUsers) ;
 
