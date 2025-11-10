@@ -102,7 +102,7 @@ const focusInput = () => {
 
 
 // ... existing imports and state declarations
-
+const connectedRef = useRef(false);
     // 1. Authentication checkconst connectedRef = useRef(false);
 
 useEffect(() => {
