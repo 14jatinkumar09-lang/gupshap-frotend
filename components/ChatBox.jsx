@@ -120,6 +120,7 @@ export function ChatBox({ user }) {
              <input onKeyDown={(e)=>{
                 if(e.key === "Enter") {
 sendingMsg() ;
+setMsgInput("") ;
                 }
             }} type="text" className="input w-full" placeholder="Type here" value={msgInput} onChange={(e)=>{
                 setMsgInput(e.target.value) ;
