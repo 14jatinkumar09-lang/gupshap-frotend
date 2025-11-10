@@ -31,7 +31,8 @@ export function Login () {
                         toast.success("logged in ")
                         localStorage.setItem("_id" , res.data.responseData.userExist._id) ;
                         
-                     
+                     const s = createSocket(!localStorage.getItem("_id"));
+    setSocket(s);
 
                         
                         navigate('/home') ;
@@ -45,11 +46,10 @@ export function Login () {
 
                     }
                 }
-    useEffect(()=>{
-        if(!localStorage.getItem("token")) return ;
-           const s = createSocket(!localStorage.getItem("_id"));
-    setSocket(s);
-    },[localStorage.getItem("token")])
+    // useEffect(()=>{
+    //     if(!localStorage.getItem("token")) return ;
+           
+    // },[localStorage.getItem("token")])
     
 const navigate = useNavigate() ;
 return <div className="flex justify-center p-10">
