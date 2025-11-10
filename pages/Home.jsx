@@ -100,7 +100,10 @@ const [s , setS]= useRecoilState(socketio);
    useEffect(()=>{
        const soc = createSocket(localStorage.getItem('_id'));
     setS(soc);
-       console.log("socket inside" , s) ;
+       console.log("function" , soc) ;
+       console.log("local storage",localStorage.getItem('_id')) ;
+       console.log("state" , s) ;
+       
 
    } , [])
   
@@ -196,7 +199,7 @@ return () => {
         // socket.off("onlineUsers");
         s.off("message");
   s.off("onlineUsers");
-    s.disconnect() ;
+   
   
         
         
@@ -204,7 +207,7 @@ return () => {
 
 
 
-},[ ]) ;
+},[]) ;
 
 // console.log("array of all online users" , onlineUsers) ;
 
