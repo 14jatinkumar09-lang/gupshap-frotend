@@ -205,7 +205,7 @@ return () => {
 
 
 
-},[selectedUser]) ;
+},[loginUser?._id, navigate, selectedUser?._id, setChats, setOnlineUsers]) ;
 
 // console.log("array of all online users" , onlineUsers) ;
 
