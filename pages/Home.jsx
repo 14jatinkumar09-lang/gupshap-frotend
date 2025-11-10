@@ -127,6 +127,10 @@ function showNotification(title, options) {
 
 }
 
+    if (socket.current) {
+        socket.current.disconnect();
+    }
+
 
 
 
