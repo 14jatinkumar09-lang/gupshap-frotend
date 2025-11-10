@@ -2,297 +2,162 @@ import { FaUserCircle } from "react-icons/fa";
 import { UserCard } from "../components/UserCard";
 import { ChatBox } from "../components/ChatBox";
 import { useNavigate } from "react-router-dom";
-import { useState , useRef, useEffect } from 'react' ;
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import axios from 'axios' ;
-import toast, { Toaster } from 'react-hot-toast';
-import {allChats, allUsers, btnLoading, current_2nd_user, loggedInUser ,msgBlink,onlineUsersArr} from '../store/ConversationUser' ;
-
-
-import { io } from 'socket.io-client' ;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import { useState, useRef, useEffect } from 'react';
+import { useRecoilState, useRecoilValue } from "recoil";
+import axios from 'axios';
+import {
+    allChats,
+    allUsers,
+    btnLoading,
+    current_2nd_user,
+    loggedInUser,
+    msgBlink,
+    onlineUsersArr
+} from '../store/ConversationUser';
+import { io } from 'socket.io-client';
 
 export function Home() {
-    
 
+    const navigate = useNavigate();
 
-    
+    const [users, setUsers] = useRecoilState(allUsers);
+    const [filterUsers, setFilterUsers] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [userSearch, setUserSearch] = useState("");
 
+    const [selectedUser, setSelectedUser] = useRecoilState(current_2nd_user);
+    const loginUser = useRecoilValue(loggedInUser);
 
+    const [chats, setChats] = useRecoilState(allChats);
+    const [onlineUsers, setOnlineUsers] = useRecoilState(onlineUsersArr);
 
+    const [btnLoad, setBtnLoad] = useRecoilState(btnLoading);
+    const [blink, setBlink] = useRecoilState(msgBlink);
 
+    const inputRef = useRef(null);
+    const socket = useRef(null);
+    const audio = useRef(null);
 
+    const connectedRef = useRef(false); // prevents duplicate socket connections
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const [onlineUsers , setOnlineUsers] = useRecoilState(onlineUsersArr) ;
-
-
-const inputRef = useRef(null);
-    const [users,setUsers] = useRecoilState(allUsers) ;
-    const [filterUsers , setFilterUsers] = useState([]) ;
-        
-const navigate = useNavigate() ;
-const [userSearch , setUserSearch] = useState("") ;
-const [selectedUser,setSelectedUser] = useRecoilState(current_2nd_user) ; 
-const loginUser = useRecoilValue(loggedInUser) ;
-const [isSearching , setIsSearching] = useState(false) ;
-const [chats , setChats] = useRecoilState(allChats) ;
-const [btnLoad , setBtnLoad] = useRecoilState(btnLoading) ;
-// console.log("chatting chats",chats);
-const [blink,setBlink ]= useRecoilState(msgBlink) ;
-
-const focusInput = () => {
-    inputRef.current.value = "" ; 
-    setIsSearching(false) ;
-    // like document.getElementById(...)
-  };
-
-  const socket = useRef( null ) ;
-  const audio = useRef(null) ;
-
-
-  
-
-/////////////////////////////////////////////////
-
-
-
-
-
-
-
-// ... existing imports and state declarations
-const connectedRef = useRef(false);
-    // 1. Authentication checkconst connectedRef = useRef(false);
-
-useEffect(() => {
-    if (connectedRef.current) return; // ⛔ prevent second run
-    connectedRef.current = true; // ✅ lock
-
-    if (!localStorage.getItem("token")) {
-        navigate("/login");
-        return;
-    }
-
-    Notification.requestPermission();
-    audio.current = new Audio('/notif.wav');
-
-    socket.current = io(import.meta.env.VITE_DB_ORIGIN_URL, {
-        query: { _id: loginUser?._id }
-    });
-
-    socket.current.on("connect", () => {
-        console.log("connected:", socket.current.id);
-    });
-
-    socket.current.on("message", (message) => {
-        audio.current?.play().catch(()=>{});
-        setChats(prev => {
-            if (message?.newMessage?.senderId === selectedUser?._id) {
-                return [...prev, message?.newMessage];
-            }
-            return prev;
-        });
-    });
-
-    socket.current.on("onlineUsers", setOnlineUsers);
-
-    return () => {
-        socket.current?.disconnect();
-        socket.current = null;
-        console.log("Socket disconnected");
+    const focusInput = () => {
+        inputRef.current.value = "";
+        setIsSearching(false);
     };
-}, []); // only run when loginUser loads
-// Added necessary dependencies
 
-// console.log("array of all online users" , onlineUsers) ;
+    // ✅ SOCKET SETUP (Runs Once Only)
+    useEffect(() => {
 
+        if (connectedRef.current) return; 
+        connectedRef.current = true;
 
+        if (!localStorage.getItem("token")) {
+            navigate("/login");
+            return;
+        }
 
+        Notification.requestPermission();
+        audio.current = new Audio('/notif.wav');
 
-//////////////////////////////////////////////////
+        socket.current = io(import.meta.env.VITE_DB_ORIGIN_URL, {
+            query: { _id: loginUser?._id }
+        });
 
-// console.log("chatss" , chats);
+        socket.current.on("connect", () => {
+            console.log("Socket Connected:", socket.current.id);
+        });
 
+        socket.current.on("message", (message) => {
+            audio.current?.play().catch(() => {});
 
-return <div className="flex flex-col items-center sm:flex-row " >
-        
-{/* hidden sm:block */}
-        <div className="part1 sm:h-screen sm:w-[35vw]  h-[50vh] w-[80vw] xl:w-[50vw] lg:w-[50vw]  md:w-[50vw] border-2 border-white/10 flex flex-col justify-between">
-
-            <div className="bg-gray-600  h-10 flex  justify-center items-center font-bold">
-                <div>GupShap</div>
-            </div>
-            <div className=" h-10 w-full ">
-                <label className="input validator w-full ">
-                    <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <g
-                            strokeLinejoin="round"
-                            strokeLinecap="round"
-                            strokeWidth="2.5"
-                            fill="none"
-                            stroke="currentColor"
-                        >
-                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </g>
-                    </svg>
-                    <input ref={inputRef}
-                    onChange={async (e)=>{
-                        setUserSearch(e.target.value) ;
-                        if(userSearch === "") {
-                            setIsSearching(false) ;
-                            return ;
-                        }
-                
-                        setTimeout(async() => {
-                            
-                            try {
-                const res = await axios.get(`${import.meta.env.VITE_URL}/user/filterUserSearch?filter=${userSearch}`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            // Update chat only if message is from selected chat user
+            setChats(prev => {
+                if (message?.newMessage?.senderId === selectedUser?._id) {
+                    return [...prev, message?.newMessage];
                 }
+                return prev;
             });
-            setIsSearching(true) ;
-            // console.log(isSearching);
-            setFilterUsers( Object.values(res.data.responseData.users) ) ; 
+        });
 
-            } 
-            catch (error) {
-                // console.log(error);
-            }
-                        }, 100);
-                        
+        socket.current.on("onlineUsers", setOnlineUsers);
 
-                    }}
+        return () => {
+            socket.current?.disconnect();
+            socket.current = null;
+            console.log("Socket Disconnected");
+        };
+
+    }, []); // ✅ no re-runs
+
+    // ✅ USER SEARCH
+    const handleSearch = async (e) => {
+        const value = e.target.value;
+        setUserSearch(value);
+
+        if (!value.trim()) {
+            setIsSearching(false);
+            return;
+        }
+
+        try {
+            const res = await axios.get(`${import.meta.env.VITE_URL}/user/filterUserSearch?filter=${value}`, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            setFilterUsers(Object.values(res.data.responseData.users));
+            setIsSearching(true);
+        } catch (error) { }
+    };
+
+    return (
+        <div className="flex flex-col items-center sm:flex-row">
+
+            {/* LEFT SIDE */}
+            <div className="part1 sm:h-screen sm:w-[35vw] h-[50vh] w-[80vw] border-2 border-white/10 flex flex-col">
+
+                <div className="bg-gray-600 h-10 flex justify-center items-center font-bold">
+                    GupShap
+                </div>
+
+                <label className="input validator w-full h-10">
+                    <input
+                        ref={inputRef}
+                        onChange={handleSearch}
                         type="text"
+                        placeholder="Search Username"
                         required
-                        placeholder="Username"
-                        pattern="[A-Za-z][A-Za-z0-9\-]*"
-                        minlength="3"
-                        maxlength="30"
-                        title="Only letters, numbers or dash"
                     />
                 </label>
 
-            </div>
-            <div className="my-2 overflow-y-scroll h-full border-2 border-white/10 ">
-                {(isSearching ? filterUsers : users)?.map((user) => {
-                    if(isSearching) {
-                        if(user._id === selectedUser._id) return ;
-                    }
-                    return user?.userName !== loginUser?.userName  ? <UserCard key={user._id} user={user} onClick={() => { 
-                        setSelectedUser(user) ;
-                        focusInput() ;
-                        let once = ()=>{
-                            if(Object.keys(selectedUser).length === 0) {
-                                return;
-                            }
-                            setUsers([ selectedUser , ... users  ]) ;
-                            once = ()=>{} ;
-                        }
-                        isSearching ? once(): null ;
+                <div className="my-2 overflow-y-scroll h-full border-2 border-white/10">
+                    {(isSearching ? filterUsers : users)?.map(user =>
+                        user.userName !== loginUser?.userName &&
+                        <UserCard key={user._id} user={user} onClick={() => {
+                            setSelectedUser(user);
+                            focusInput();
+                        }} />
+                    )}
+                </div>
 
-                    }} /> : ""
-                })}
-            </div>
-            <button className=" h-20 text-blue-300 text-center hidden gap-10 items-center px-5 hover:cursor-pointer sm:block sm:flex justify-center text-2xl font-bold" 
-            onClick={()=>{
-                setSelectedUser(loginUser) ;
-                navigate("/profileUpdate") ;
-            }}>
-
-                 <div>
+                {/* PROFILE BUTTON */}
+                <button
+                    className="h-20 text-blue-300 px-5 sm:flex justify-center text-2xl font-bold hidden"
+                    onClick={() => { setSelectedUser(loginUser); navigate("/profileUpdate"); }}
+                >
                     <div className="avatar avatar-online">
-  <div className="w-10 rounded-full">
-    <img src={loginUser?.avatar} />
-  </div>
-</div>
-                 </div>
-<div >{loginUser?.fullName}</div>
-            </button>
-            {/* <div className="hidden">{toast.success("logged in")} <Toaster /></div> */}
+                        <div className="w-10 rounded-full">
+                            <img src={loginUser?.avatar} />
+                        </div>
+                    </div>
+                    <div>{loginUser?.fullName}</div>
+                </button>
+
+            </div>
+
+            {/* RIGHT SIDE (CHAT) */}
+            <div className="part2 border border-white/10 w-full sm:h-screen h-[50vh]">
+                <ChatBox user={selectedUser} />
+            </div>
 
         </div>
-        
-
-        <div className="part2 border border-white/10 w-full sm:h-screen  h-[50vh] " >
-        
-<ChatBox user={selectedUser}  />
-
-
-             </div>
-            
-
-
-    </div>
+    );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// try {
-//                                 const res = await axios.get(`${import.meta.env.VITE_URL}user/filterUserSearch?filter=${userSearch}` , {
-//                 headers: {
-//                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
-//                 }
-//             }) ;
-//                         setUsers(res.data.responseData.users) ;
-//                         console.log(res.data.responseData.users) ;
-                        
-
-                                
-//                             } catch (error) {
-//                                 console.log(error) ;
-//                             }
