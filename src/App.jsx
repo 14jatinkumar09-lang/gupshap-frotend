@@ -20,7 +20,7 @@ import axios from 'axios' ;
 
 function App() {
  
-useEffect(() => {
+useEffect(async() => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
