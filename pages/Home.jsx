@@ -212,7 +212,7 @@ return () => {
 
 
 
-},[loginUser , s]) ;
+},[]) ;
 
 // console.log("array of all online users" , onlineUsers) ;
 
