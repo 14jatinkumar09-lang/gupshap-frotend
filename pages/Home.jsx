@@ -109,7 +109,7 @@ const [s , setS]= useRecoilState(socketio);
     setS(soc);
        console.log("function" , soc) ;
        console.log("local storage",localStorage.getItem('_id')) ;
-       console.log("state" , s) ;
+       console.log("state" , soc) ;
        
 
 
@@ -156,14 +156,14 @@ function showNotification(title, options ,sender) {
 
 
 
-s.on("connect" , ()=>{
- console.log("Socket Connected:", s.id);
+soc.on("connect" , ()=>{
+ console.log("Socket Connected:", soc.id);
 //   console.log("ID:", socket.id);
 //   console.log("Status:", socket.connected);
 
 })
 
-s.on("message" , (message)=>{
+soc.on("message" , (message)=>{
 
     
     audio.current.play() ;
@@ -193,7 +193,7 @@ showNotification("GupShap", {
 
 
 
-s.on("onlineUsers" , (OnlineUsers)=>{
+soc.on("onlineUsers" , (OnlineUsers)=>{
 
     setOnlineUsers( OnlineUsers) ;
     
@@ -202,8 +202,8 @@ s.on("onlineUsers" , (OnlineUsers)=>{
 
 return () => {
         // socket.off("onlineUsers");
-        s.off("message");
-  s.off("onlineUsers");
+        soc.off("message");
+  soc.off("onlineUsers");
    
   
         
@@ -212,7 +212,7 @@ return () => {
 
 
 
-},[]) ;
+},[selectedUser]) ;
 
 // console.log("array of all online users" , onlineUsers) ;
 
