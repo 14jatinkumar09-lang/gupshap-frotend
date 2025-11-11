@@ -7,9 +7,11 @@ export const createSocket = (userId) => {
 
   socket = io(import.meta.env.VITE_DB_ORIGIN_URL, {
     query: { _id: userId },
+    transports: ["websocket"], 
   });
 
   return socket;
 };
+
 
 export const getSocket = () => socket;
