@@ -7,7 +7,7 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import axios from 'axios' ;
 import toast, { Toaster } from 'react-hot-toast';
 import {allChats, allUsers, btnLoading, current_2nd_user, loggedInUser ,msgBlink,onlineUsersArr} from '../store/ConversationUser' ;
-import { createSocket } from "../src/socket.js"
+import { createSocket , getSocket} from "../src/socket.js"
 
 import { io } from 'socket.io-client' ;
 import { socketio } from "../store/ConversationUser";
@@ -92,35 +92,36 @@ const audio = useRef(null) ;
 
 const [s , setS]= useRecoilState(socketio);
   
-  if( !loginUser || !chats || !users || ) return ;
+  
   
   /////////////////////////////////////////////////
 
-
-   useEffect(()=>{
-     
-   } , [])
-  
-  
+ useEffect(() => {
+    if (!s) {
+      const userId = localStorage.getItem('_id');
+      if (userId) {
+        const soc = createSocket(userId);
+        setS(soc);
+      }
+    }
+  }, [s, setS]);
   
   
   useEffect(()=>{
-  const soc = createSocket(localStorage.getItem('_id'));
-    setS(soc);
-       console.log("function" , soc) ;
-       console.log("local storage",localStorage.getItem('_id')) ;
-       console.log("state" , soc) ;
+  
        
+if(!localStorage.getItem("token")) {
+      navigate("/login");
+      return;
+    }
+
+    const soc = s || getSocket();
+    if (!soc) return;
 
 
 
 
 
-if (soc) return;
-       if(!localStorage.getItem("token")) {
-          navigate("/login") ;
-          return ;
-        }
 
     
 
@@ -195,7 +196,7 @@ showNotification("GupShap", {
 
 soc.on("onlineUsers" , (OnlineUsers)=>{
 
-    setOnlineUsers( OnlineUsers) ;
+    setOnlineUsers( prev => OnlineUsers) ;
     
 } )
 
@@ -212,7 +213,7 @@ return () => {
 
 
 
-},[]) ;
+},[s, selectedUser, setSelectedUser, setChats, setOnlineUsers, navigate]) ;
 
 // console.log("array of all online users" , onlineUsers) ;
 
