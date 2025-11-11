@@ -81,7 +81,7 @@ export function ChatBox({ user }) {
    
 
     return <div  className="flex flex-col justify-between h-full  ">
-        <div className= {` ${Object.keys(user).length === 0 ? "hidden" : "1" } border border-white/10 flex gap-2`} >
+        <div className= {` ${!selectedUser?._id ? "hidden" : "1" } border border-white/10 flex gap-2`} >
 
             <UserCard onClick={async()=>{
                 // console.log("clicked");
@@ -91,7 +91,7 @@ export function ChatBox({ user }) {
             }} user={selectedUser} />
         </div>
 
-        {!user._id ? <div className=' h-full flex flex-col items-center justify-end p-5'> 
+        {!selectedUser?._id ? <div className=' h-full flex flex-col items-center justify-end p-5'> 
             {/* <h1>Welcome to GupShap </h1>  */}
         <div>Select a User to continue..</div> 
         </div> : <></>}
@@ -101,13 +101,13 @@ export function ChatBox({ user }) {
 
 
             {chats.map((chat)=>{
-                return <div  ref={messageRef} key={chat?._id} className={`chat  ${Object.keys(selectedUser).length === 0 ? "hidden" : null}   ${chat.senderId === loginUser._id ? "chat-end" :"chat-start" } `}>
+                return <div  ref={messageRef} key={chat?._id} className={`chat  ${!selectedUser?._id ? "hidden" : null}   ${chat?.senderId === loginUser?._id ? "chat-end" :"chat-start" } `}>
                     
                 <div className="chat-header">
-                    {chat?.senderId === loginUser._id ? loginUser.fullName : selectedUser.fullName}
-                    <time className="text-xs opacity-50">{dayjs(chat.createdAt).format("hh:mm A")}</time>
+                    {chat?.senderId === loginUser._id ? loginUser?.fullName : selectedUser?.fullName}
+                    <time className="text-xs opacity-50">{dayjs(chat?.createdAt).format("hh:mm A")}</time>
                 </div>
-                <div className="chat-bubble">{chat.messages}</div>
+                <div className="chat-bubble">{chat?.messages}</div>
                 {/* <div className="chat-footer opacity-50">Seen</div> */}
             </div> 
             })}
