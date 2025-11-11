@@ -24,7 +24,7 @@ useEffect(async() => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
       await axios.post(`${import.meta.env.VITE_URL}/user/getUser`, {} ,{
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
