@@ -116,7 +116,7 @@ const [s , setS]= useRecoilState(socketio);
 
 
 
-if (!soc) return;
+if (soc) return;
        if(!localStorage.getItem("token")) {
           navigate("/login") ;
           return ;
