@@ -21,20 +21,29 @@ import axios from 'axios' ;
 function App() {
  
 useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
+  const token = localStorage.getItem("token");
+  if (!token) return;
 
-    const interval = setInterval(async () => {
-      await axios.post(`${import.meta.env.VITE_URL}/user/getUser`, {} ,{
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                }
-            });
-      }).catch(() => {});
-    }, 240000); // every 4 minutes
+  const interval = setInterval(async () => {
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_URL}/user/getUser`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+    } catch (err) {
+      // optional: handle error silently
+      console.log("Keep-alive failed", err);
+    }
+  }, 240000); // every 4 minutes
 
-    return () => clearInterval(interval);
-  }, []);
+  return () => clearInterval(interval);
+}, []);
+
 
   return <div>
 
