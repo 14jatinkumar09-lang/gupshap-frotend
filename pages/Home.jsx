@@ -92,7 +92,7 @@ const audio = useRef(null) ;
 
 const [s , setS]= useRecoilState(socketio);
   
-  
+  if( !loginUser || !chats || !users || ) return ;
   
   /////////////////////////////////////////////////
 
