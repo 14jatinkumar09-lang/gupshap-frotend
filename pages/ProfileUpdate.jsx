@@ -31,17 +31,18 @@ function removeEmpty(obj) {
 
         async function sendUpdateReq() {
 
-            setDetails({
-                userName ,fullName , avatar
-            })
             
-            const body = removeEmpty(details) ;
-            // console.log(body);
+            
+            const data = removeEmpty({
+                userName , fullName , avatar
+            }) ;
+
+            console.log(data);
             
             
             try {
                 setBtnLoad(true) ;
-                const res = await axios.post(`${import.meta.env.VITE_URL}/user/updateuserdeatils` , body , {
+                const res = await axios.post(`${import.meta.env.VITE_URL}/user/updateuserdeatils` , {data} , {
                     headers : {
                         'Authorization': `Bearer ${localStorage.getItem('token')}` ,
                     }
@@ -71,7 +72,10 @@ function removeEmpty(obj) {
                 setFullNameInput(e.target.value) ;
             }}
             label={"Full Name"} placeholder={loginUser?.fullName}type={"text"}></InputBox>
-            <InputBox label={"My Avatar"} placeholder={"Paste the link of your avatar ...."} type={"data"}></InputBox>
+            <InputBox onChange={(e)=>{
+                setAvatar(e.target.value) ;
+            } }
+            label={"My Avatar"} placeholder={"Paste the link of your avatar ...."} type={"text"}></InputBox>
             <div className="p-5 ">
               
     {!btnLoad?<button onClick={()=>{
@@ -95,6 +99,7 @@ function removeEmpty(obj) {
             onClick={()=>{
                 localStorage.removeItem("token") ;
                 navigate("/login") ;
+                window.location.reload() ;
             }}>
     Logout
             </button>
