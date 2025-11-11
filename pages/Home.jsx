@@ -291,7 +291,7 @@ return <div className="flex flex-col items-center sm:flex-row " >
                     if(isSearching) {
                         if(user._id === selectedUser._id) return ;
                     }
-                    return user?.userName !== loginUser?.userName  ? <UserCard key={user._id} user={user} onClick={() => { 
+                    return user?.userName !== loginUser?.userName  ? <UserCard key={user?._id} user={user} onClick={() => { 
                         setSelectedUser(user) ;
                         focusInput() ;
                         let once = ()=>{
