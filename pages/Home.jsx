@@ -98,19 +98,24 @@ const [s , setS]= useRecoilState(socketio);
 
 
    useEffect(()=>{
-       const soc = createSocket(localStorage.getItem('_id'));
-    setS(soc);
-       console.log("function" , soc) ;
-       console.log("local storage",localStorage.getItem('_id')) ;
-       console.log("state" , s) ;
-       
-
+     
    } , [])
   
   
   
   
   useEffect(()=>{
+  const soc = createSocket(localStorage.getItem('_id'));
+    setS(soc);
+       console.log("function" , soc) ;
+       console.log("local storage",localStorage.getItem('_id')) ;
+       console.log("state" , s) ;
+       
+
+
+
+
+
 if (!s) return;
        if(!localStorage.getItem("token")) {
           navigate("/login") ;
@@ -207,7 +212,7 @@ return () => {
 
 
 
-},[]) ;
+},[loginUser , s]) ;
 
 // console.log("array of all online users" , onlineUsers) ;
 
