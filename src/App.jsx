@@ -5,7 +5,7 @@ import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import toast, { Toaster } from 'react-hot-toast';
 
-
+    
 import { Login } from '../pages/Login.jsx';
 import { Signup } from '../pages/Signup.jsx';
 import { Home } from '../pages/Home.jsx'
