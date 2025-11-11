@@ -16,10 +16,25 @@ import { useEffect } from 'react';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { loggedInUser, socketio } from '../store/ConversationUser.jsx';
 import { io } from 'socket.io-client' ;
-
+import axios from 'axios' ;
 
 function App() {
  
+useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const interval = setInterval(() => {
+      await axios.post(`${import.meta.env.VITE_URL}/user/getUser`, {} ,{
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                }
+            });
+      }).catch(() => {});
+    }, 240000); // every 4 minutes
+
+    return () => clearInterval(interval);
+  }, []);
 
   return <div>
 
