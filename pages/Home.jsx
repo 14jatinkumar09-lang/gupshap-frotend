@@ -196,7 +196,7 @@ showNotification("GupShap", {
 
 soc.on("onlineUsers" , (OnlineUsers)=>{
 
-    setOnlineUsers(  OnlineUsers) ;
+    setOnlineUsers(  prev => OnlineUsers) ;
     
 } )
 
