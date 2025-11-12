@@ -196,7 +196,7 @@ showNotification("GupShap", {
 
 soc.on("onlineUsers" , (OnlineUsers)=>{
 
-    setOnlineUsers( OnlineUsers) ;
+    setOnlineUsers(  OnlineUsers) ;
     
 } )
 
@@ -213,7 +213,7 @@ return () => {
 
 
 
-},[s, selectedUser, setSelectedUser, setChats, setOnlineUsers, navigate]) ;
+},[s, selectedUser, setSelectedUser, setChats, setOnlineUsers, onlineUsers, navigate]) ;
 
 // console.log("array of all online users" , onlineUsers) ;
 
