@@ -4,6 +4,7 @@ import { onlineUsersArr } from "../store/ConversationUser"
 
 export function UserCard ({onClick , user}) {
   const onlineUsers = useRecoilValue(onlineUsersArr) ;
+  console.log(onlineUsers) ;
     return <button className="w-full p-1 hover:cursor-pointer"
     onClick={onClick} >
             <div>
