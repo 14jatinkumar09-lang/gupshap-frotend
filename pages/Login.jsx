@@ -3,45 +3,77 @@ import dotenv from 'dotenv' ;
 import { InputBox } from "../components/InputBox"
 import { Button } from "../components/Button" 
 import { useNavigate } from "react-router-dom"
-import { useState } from 'react' ;
+import { useEffect, useState } from 'react' ;
 import axios from 'axios' ;
 import toast, { Toaster } from 'react-hot-toast';
-import {  btnLoading, loggedInUser } from '../store/ConversationUser';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { socketio } from "../store/ConversationUser";
+import { createSocket } from "../src/socket.js"
+import { useDispatch } from 'react-redux';
+
 
 
 export function Login () {
-    const [btnLoad , setBtnLoad] = useRecoilState(btnLoading) ;
-    const [userName,setuserName] = useState("") ;
-    const [password,setPassword]  = useState("")  ;
+    const [btnLoad , setBtnLoad] = useState(false) ;
 
+    const [userData , setUserData] = useState({
+        userName : "" ,
+        password : ""
+    })
+
+    function onChange(e) {
+        const obj = {} ;
+        obj[e.target.name] = e.target.value ;
+
+        setUserData({ ...userData , ...obj  })
+        console.log(userData);
+        console.log(e.target.value);
+
+    }
+
+// const dispatch = useDispatch();
+
+
+// useEffect(()=>{
+//     if(localStorage.getItem("_id")) {
+//         createSocket(localStorage.getItem("_id"));
+//     }
+// },[btnLoad]) ;
+
+    // const setSocket = useSetRecoilState(socketio);
     const login = async()=>{
-        if(userName==="" || password==="") {
+        if(userData.userName==="" || userData.password==="") {
             toast("enter user / password")
             return ;
         }
                     try {
                         setBtnLoad(true)  ;
 
-                        const res =  await axios.post( `${import.meta.env.VITE_URL}/user/login` , {
-                            userName,password
-                        })
+                        const res =  await axios.post( `${import.meta.env.VITE_URL}/user/login` , userData)
                         toast.success("logged in ")
+                        localStorage.setItem("_id" , res.data.responseData.userExist._id) ;
                         
+                        
+                        
+    //                  const s = createSocket(!localStorage.getItem("_id"));
+    // setSocket(s);
 
                         
+                        navigate('/home') ;
                        setBtnLoad(false) ; 
                         localStorage.setItem("token" , res.data.responseData.token) ;
-                        navigate('/home') ;
                     } catch (error) {
                         
                         
-                        toast.error(error.response.data.errMessage) ;
                         setBtnLoad(false) ; 
+                        
+                        toast.error(error?.response?.data?.errMessage || "Login Failed Check your Internet Connection") ;
 
                     }
                 }
-    
+    // useEffect(()=>{
+    //     if(!localStorage.getItem("token")) return ;
+           
+    // },[localStorage.getItem("token")])
     
 const navigate = useNavigate() ;
 return <div className="flex justify-center p-10">
@@ -50,22 +82,20 @@ return <div className="flex justify-center p-10">
             <div className="border-2 border-gray-200 w-110 text-center rounded-md shadow-2xl">
                 <h1 className="font-bold text-xl m-2">Welcome Back</h1>
                 <div>Enter your credentials to access your account </div>
-                <InputBox onKeyDown={(e)=>{
+                <InputBox name={"userName"} value={userData.userName}
+                onKeyDown={(e)=>{
                     if(e.key === "Enter") {
                         login() ;
                     }
                 }}
-                onChange={(e)=>{
-                    setuserName(e.target.value) ;
-                }} type={'text'} placeholder={"you@example..com"} label={"UserName"} />
-                <InputBox onKeyDown={(e)=>{
+                onChange={onChange} type={'text'} placeholder={"you@example..com"} label={"UserName"} />
+                <InputBox name={"password"} value={userData.password}
+                onKeyDown={(e)=>{
                     if(e.key === "Enter") {
                         login() ;
                     }
                 }}
-                onChange={(e)=>{
-                    setPassword(e.target.value) ;
-                }} type={'password'} placeholder={". . . . . . . . "} label={"Password"} />
+                onChange={onChange} type={'password'} placeholder={". . . . . . . . "} label={"Password"} />
 
                 <div className="m-6">
                     

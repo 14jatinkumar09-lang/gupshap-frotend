@@ -3,146 +3,195 @@ import { UserCard } from "../components/UserCard";
 import { ChatBox } from "../components/ChatBox";
 import { useNavigate } from "react-router-dom";
 import { useState , useRef, useEffect } from 'react' ;
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+
 import axios from 'axios' ;
 import toast, { Toaster } from 'react-hot-toast';
-import {allChats, allUsers, btnLoading, current_2nd_user, loggedInUser ,msgBlink,onlineUsersArr} from '../store/ConversationUser' ;
 
-
-import { io } from 'socket.io-client' ;
-
+import { createSocket , getSocket} from "../src/socket.js"
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import { useDispatch, useSelector } from "react-redux";
+import { fetchFilterUsers, fetchFriendUsers, fetchLoginUser } from "../redux.store/slice/userSlice/slice.user.thunk.js";
+import { selectUser , setOnlineUsers } from "../redux.store/slice/userSlice/slice.user.js";
+import { fetchMessages } from "../redux.store/slice/msgSlice/slice.message.thunk.js";
+import { setChats } from "../redux.store/slice/msgSlice/slice.message.js";
 
 
 export function Home() {
     
-
-
-    
-
-
-
+    const { allFriendUsers , loading , filterSearchUsers , loginUser , homePageLoader , selectedUser , onlineUsers } = useSelector(state => state.user) ;
+    const {chats} = useSelector(state => state.message) ;
+    const dispatch = useDispatch() ;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const [onlineUsers , setOnlineUsers] = useRecoilState(onlineUsersArr) ;
 
 
 const inputRef = useRef(null);
-    const [users,setUsers] = useRecoilState(allUsers) ;
-    const [filterUsers , setFilterUsers] = useState([]) ;
+    
+
         
 const navigate = useNavigate() ;
 const [userSearch , setUserSearch] = useState("") ;
-const [selectedUser,setSelectedUser] = useRecoilState(current_2nd_user) ; 
-const loginUser = useRecoilValue(loggedInUser) ;
-const [isSearching , setIsSearching] = useState(false) ;
-const [chats , setChats] = useRecoilState(allChats) ;
-const [btnLoad , setBtnLoad] = useRecoilState(btnLoading) ;
+
+
+// const [chats , setChats] = useRecoilState(allChats) ;
+
 // console.log("chatting chats",chats);
-const [blink,setBlink ]= useRecoilState(msgBlink) ;
-
-const focusInput = () => {
-    inputRef.current.value = "" ; 
-    setIsSearching(false) ;
-    // like document.getElementById(...)
-  };
-
-/////////////////////////////////////////////////
 
 
 
 
+const audio = useRef(null) ;
+ 
+// const [s , setS]= useRecoilState(socketio);
+  const s = getSocket() ;
+  
+
+  
 
 
 
-useEffect(()=>{
 
-    if(!localStorage.getItem("token")) {
-        navigate("/login") ;
-        
+// console.log("recoil state " , users);
+useEffect ( ()=>{
+    dispatch(fetchLoginUser()) ;
+    dispatch(fetchFriendUsers()) ;
+} ,[] )
+
+// console.log("redux state", allFriendUsers) ;
+// console.log("filterUsers redux" , filterSearchUsers);
+  /////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+ useEffect(() => {
+    if (!s) {
+      const userId = localStorage.getItem('_id');
+      if (userId) {
+        const soc = createSocket(userId);
+        // setSocket(soc);
+      }
     }
+  }, [s]);
+  
+  
+  useEffect(()=>{
+  
+       
+if(!localStorage.getItem("token")) {
+      navigate("/login");
+      return;
+    }
+
+    const soc = s || getSocket();
+    if (!soc) return;
+
+
+
+
+
 
     
-const socket = io(import.meta.env.VITE_DB_ORIGIN_URL , 
-    {
-        query : {
-            _id : loginUser?._id  ,
-        }
-    }
-) ;
 
+Notification.requestPermission().then(permission => {
+  console.log("Permission:", permission); // "granted", "denied", or "default"
+});
 
+function showNotification(title, options ,sender) {
+  if (Notification.permission === "granted") {
+    new Notification(title, options).onclick = (e) =>{
+    e.preventDefault();
 
-socket.on("connect" , ()=>{
+    dispatch(selectUser(sender)) ;
+    window.focus() ;
+    // window.open() ;
+  }
+  }
+
+}
  
+
+
+
+
+
+
+    audio.current = new Audio('/notif.wav');  
+    
+
+    
+
+
+
+
+
+soc.on("connect" , ()=>{
+//  console.log("Socket Connected:", soc.id);
 //   console.log("ID:", socket.id);
 //   console.log("Status:", socket.connected);
 
 })
 
-socket.on("message" , (message)=>{
-    setChats(prev => [...prev  , message]) ;    
+soc.on("message" , (message)=>{
+
+    
+    audio.current.play() ;
+
+        
+    
+    // console.log(message?.newMessage?.senderId , ":" , selectedUser?._id );
+    if(message?.newMessage?.senderId !== selectedUser?._id) {
+         try {
+showNotification("GupShap", {
+    body: `${message?.sender?.fullName} \nSent You a Message\n${message?.newMessage?.messages} `|| "You have a new message",
+    icon: message?.sender?.avatar ,
+  } , message?.sender);
+    } catch (error) {
+        // console.log(error);
+    }
+        return ;
+    }
+    dispatch(setChats(message?.newMessage)) ;  
+    
+    
+   
+
 })
 
 
 
 
-if(!socket) return ;
-socket.on("onlineUsers" , (OnlineUsers)=>{
-    
-    setOnlineUsers( prev => OnlineUsers) ;
+
+soc.on("onlineUsers" , (OnlineUsers)=>{
+
+    dispatch(setOnlineUsers(OnlineUsers)) ;
     
 } )
+
+
 return () => {
         // socket.off("onlineUsers");
-        socket.close() ;
+        soc.off("message");
+  soc.off("onlineUsers");
+   
+  
         
         
-    }
+    };
 
 
 
-},[]) ;
+},[s, selectedUser , onlineUsers, navigate]) ;
 
 // console.log("array of all online users" , onlineUsers) ;
 
@@ -154,7 +203,7 @@ return () => {
 // console.log("chatss" , chats);
 
 
-return <div className="flex flex-col items-center sm:flex-row " >
+return !homePageLoader ? <div className="flex flex-col items-center sm:flex-row " >
         
 {/* hidden sm:block */}
         <div className="part1 sm:h-screen sm:w-[35vw]  h-[50vh] w-[80vw] xl:w-[50vw] lg:w-[50vw]  md:w-[50vw] border-2 border-white/10 flex flex-col justify-between">
@@ -176,68 +225,49 @@ return <div className="flex flex-col items-center sm:flex-row " >
                             <circle cx="12" cy="7" r="4"></circle>
                         </g>
                     </svg>
-                    <input ref={inputRef}
+                    <input value={userSearch}
+                    ref={inputRef}
                     onChange={async (e)=>{
-                        setUserSearch(e.target.value) ;
-                        if(userSearch === "") {
-                            setIsSearching(false) ;
-                            return ;
-                        }
-                
-                        setTimeout(async() => {
-                            
-                            try {
-                const res = await axios.get(`${import.meta.env.VITE_URL}/user/filterUserSearch?filter=${userSearch}`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                }
-            });
-            setIsSearching(true) ;
-            // console.log(isSearching);
-            setFilterUsers( Object.values(res.data.responseData.users) ) ; 
 
-            } 
-            catch (error) {
-                // console.log(error);
-            }
-                        }, 100);
-                        
+                        setUserSearch(e.target.value) ;
+                        // console.log(userSearch);
+                        if(e.target.value === "" ) return
+                        dispatch(fetchFilterUsers(e.target.value)) ;
 
                     }}
                         type="text"
                         required
                         placeholder="Username"
                         pattern="[A-Za-z][A-Za-z0-9\-]*"
-                        minlength="3"
+                        minlength=""
                         maxlength="30"
                         title="Only letters, numbers or dash"
                     />
                 </label>
 
             </div>
-            <div className="my-2 overflow-y-scroll h-full border-2 border-white/10 ">
-                {(isSearching ? filterUsers : users)?.map((user) => {
-                    if(isSearching) {
-                        if(user._id === selectedUser._id) return ;
-                    }
-                    return user?.userName !== loginUser?.userName  ? <UserCard key={user._id} user={user} onClick={() => { 
-                        setSelectedUser(user) ;
-                        focusInput() ;
-                        let once = ()=>{
-                            if(Object.keys(selectedUser).length === 0) {
-                                return;
-                            }
-                            setUsers([ selectedUser , ... users  ]) ;
-                            once = ()=>{} ;
-                        }
-                        isSearching ? once(): null ;
 
-                    }} /> : ""
-                })}
+
+            <div className="my-2 overflow-y-scroll h-full border-2 border-white/10 ">
+            {/* {filterSearchUsers?.length === 0 ? <div className="text-center"> No User Found </div> : null } */}
+
+
+                {!loading ? (userSearch  ? filterSearchUsers : allFriendUsers)?.map((user) => {
+                        if(user._id === loginUser._id) return ;
+                    
+                    return  <UserCard key={user?._id} user={user} onClick={() => { 
+                        if(selectedUser?._id === user?._id) return ;
+                        dispatch(selectUser(user)) ;
+                        // console.log("selected user",user);
+                        if(!selectUser)return  ;
+                        dispatch(fetchMessages(user)) ;
+                    }} /> 
+                    
+                }) : <div className="flex justify-center"> <span className="loading loading-bars loading-xl"></span> </div> }
             </div>
             <button className=" h-20 text-blue-300 text-center hidden gap-10 items-center px-5 hover:cursor-pointer sm:block sm:flex justify-center text-2xl font-bold" 
             onClick={()=>{
-                setSelectedUser(loginUser) ;
+                dispatch(selectUser(loginUser)) ;
                 navigate("/profileUpdate") ;
             }}>
 
@@ -264,7 +294,7 @@ return <div className="flex flex-col items-center sm:flex-row " >
             
 
 
-    </div>
+    </div> : <div className="h-screen flex justify-center items-center " >  <span className="loading loading-infinity loading-10xl"></span>  </div>
 }
 
 

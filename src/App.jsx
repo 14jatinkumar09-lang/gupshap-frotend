@@ -10,15 +10,16 @@ import { Login } from '../pages/Login.jsx';
 import { Signup } from '../pages/Signup.jsx';
 import { Home } from '../pages/Home.jsx'
 import { Profile } from '../pages/Profile.jsx';
+import { ProfileUpdate } from '../pages/ProfileUpdate.jsx';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { ProfileUpdate } from '../pages/ProfileUpdate.jsx';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { loggedInUser, socketio } from '../store/ConversationUser.jsx';
+import { io } from 'socket.io-client' ;
 
 
 function App() {
-  
-
-
+ 
 
   return <div>
 

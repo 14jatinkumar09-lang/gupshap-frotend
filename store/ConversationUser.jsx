@@ -1,6 +1,7 @@
 import { atom, selector, useRecoilValue } from 'recoil';
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client' ;
 // const navigate = useNavigate() ;
 
 
@@ -10,19 +11,19 @@ export const allUsers = atom({
     default: selector({
         key: "existingConvoUsers",
         get: async () => {
-            try {
-                const res = await axios.get(`${import.meta.env.VITE_URL}/user/getallusers`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                }
-            });
-            // console.log("all users that logged in user has ever talked with",res.data.responseData.users);
-            return (res.data.responseData.users);
+            // try {
+            //     const res = await axios.get(`${import.meta.env.VITE_URL}/user/getallusers`, {
+            //     headers: {
+            //         'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            //     }
+            // });
+            // // console.log("all users that logged in user has ever talked with",res.data.responseData.users);
+            // return (res.data.responseData.users);
 
-            } 
-            catch (error) {
-                // console.log(error);
-            }
+            // } 
+            // catch (error) {
+            //     console.log(error);
+            // }
         }
     })
 })
@@ -42,19 +43,19 @@ export const loggedInUser = atom({
     default: selector({
         key: "selectorforfeuserget",
         get: async () => {
-             try {
-                const res = await axios.post(`${import.meta.env.VITE_URL}/user/getUser`, {} ,{
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                }
-            });
-            // console.log("logged in user ",res.data.responseData.user);
-            return (res.data.responseData.user);
+            //  try {
+            //     const res = await axios.post(`${import.meta.env.VITE_URL}/user/getUser`, {} ,{
+            //     headers: {
+            //         'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            //     }
+            // });
+            // // console.log("logged in user ",res.data.responseData.user);
+            // return (res.data.responseData.user);
             
-            } 
-            catch (error) {
-                // console.log(error);
-            }
+            // } 
+            // catch (error) {
+            //     // console.log(error);
+            // }
             
         }
     }),
@@ -89,3 +90,24 @@ export const msgBlink = atom({
         
     } ,
 })
+
+
+
+export const socketio = atom({
+    key:"socket" ,
+    default :  null ,
+dangerouslyAllowMutability: true, 
+})
+
+
+// export const socketio = atom({
+//     key:"socket" ,
+//     default :  io(import.meta.env.VITE_DB_ORIGIN_URL , 
+//     {
+//         query : {
+//             _id : localStorage.getItem("_id") ,
+//         }
+//     }
+// ) ,
+// dangerouslyAllowMutability: true, 
+// })

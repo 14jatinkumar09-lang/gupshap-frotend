@@ -5,40 +5,42 @@ import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 
 import { useState } from 'react';
-import { useRecoilState } from "recoil";
-import { btnLoading } from "../store/ConversationUser";
+
 
 export function Signup() {
-    const [btnLoad , setBtnLoad] = useRecoilState(btnLoading) ;
+    const [btnLoad , setBtnLoad] = useState(false) ;
     
     const navigate = useNavigate(0);
-    const [fullName, setFullName] = useState("");
-    const [gender , setGender] = useState("") ;
-   
-    const [userName, setuserName] = useState("");
-    const [password, setPassword] = useState("");
-     
-    const [confirmPassword, setConfirmPassword] = useState("");
+
+    const [UserData , setUserData] = useState({
+        fullName : "" ,
+        userName : "" , 
+        gender : "" ,
+        password : "" ,
+        confirmPassword : ""
+    })
+    function inputOnchange(e) {
+        const obj = {} ;
+        obj[e.target.name] = e.target.value ;
+        setUserData({...UserData , ...obj}) ;
+    } 
+    // console.log(UserData);
+    
 
     const register = async () => {
         
-        if (fullName == "" || userName == "" || gender == "" || password == "" || confirmPassword == "") {
-            toast("empty fields");
+        if (UserData.fullName == "" || UserData.userName == "" || UserData.gender == "" || UserData.password == "" || UserData.confirmPassword == "") {
+            toast.error("empty fields");
             return;
         }
-        if (password !== confirmPassword) {
+        if (UserData.password !== UserData.confirmPassword) {
             toast.error("Password and Confirm Password are Not Matching  ")
             return;
         }
         
         try {
                     setBtnLoad(true) ;
-                    const res = await axios.post(`${import.meta.env.VITE_URL}/user/register`, {
-                        fullName,
-                        userName,
-                        gender  ,
-                        password
-                    })
+                    const res = await axios.post(`${import.meta.env.VITE_URL}/user/register`, UserData)
                     localStorage.setItem( 'token' , res.data.responseData.token ) ;
                     if(res.status === 200) {
                             toast.success(res.data.responseData.message);
@@ -49,12 +51,11 @@ export function Signup() {
                 } 
                 
                 catch (error) {
-                    if (error.status == 400 || error.status == 401 || error.status == 500) {
-                        
-                        toast(error.response.data.errMessage);
-                        setBtnLoad(false) ;
+
+                    setBtnLoad(false) ;
+                        toast.error(error?.response?.data?.errMessage || "SignUp Failed Check Your Internet Connection");
                         return;
-                    }
+                    
                 }
 
 
@@ -66,47 +67,44 @@ export function Signup() {
         <div className="border-2 border-gray-200 w-110 text-center rounded-md shadow-2xl">
             <h1 className="font-bold text-xl m-2">Create Account</h1>
             <div>Enter your details to create a new account</div>
-            <InputBox onKeyDown={(e)=>{
+            <InputBox value={UserData.fullName} name={"fullName"}
+            onKeyDown={(e)=>{
                 if(e.key === "Enter") {
                     register() ;
                 }
             }}
-            label={'Full Name'} required="true" placeholder={"Ram Lakhan"} onChange={(e) => {
-                setFullName(e.target.value);
-            }} ></InputBox>
+            label={'Full Name'} required="true" placeholder={"Ram Lakhan"} onChange={inputOnchange} ></InputBox>
             
-            <InputBox onKeyDown={(e)=>{
+            <InputBox value={UserData.userName} name={"userName"}
+            onKeyDown={(e)=>{
                 if(e.key === "Enter") {
                     register() ;
                 }
             }}
-            label={'UserName / Email'} type={"text"} placeholder={"UserName OR example@gmail.com"} onChange={(e) => {
-                setuserName(e.target.value);
-            }}  ></InputBox>
+            label={'UserName / Email'} type={"text"} placeholder={"UserName OR example@gmail.com"} onChange={inputOnchange}  ></InputBox>
+
             <div className="flex gap-4 px-5 ">
-                <label>male</label>
-                <input type="radio" name="radio-1" className="radio-md " onClick={()=>{setGender("male")}}  />
-                <label>female</label>
-                <input type="radio" name="radio-1" className="radio-md" onClick={()=>{setGender("female")}} />
+                <label htmlFor="radioMale" >male</label>
+                <input type="radio" id="radioMale" name="radio-1" className="radio-md " onClick={()=>{setUserData({...UserData , gender : "male"})}}  />
+                <label htmlFor="radioFemale">female</label>
+                <input type="radio" id="radioFemale" name="radio-1" className="radio-md" onClick={()=>{setUserData({...UserData , gender : "female"})}} />
 
 
             </div>
-            <InputBox onKeyDown={(e)=>{
+            <InputBox value={UserData.password} name={"password"}
+            onKeyDown={(e)=>{
                 if(e.key === "Enter") {
                     register() ;
                 }
             }}
-            label={'Password'} type={"password"} placeholder={". . . . . . . ."} onChange={(e) => {
-                setPassword(e.target.value);
-            }}  ></InputBox>
-            <InputBox onKeyDown={(e)=>{
+            label={'Password'} type={"password"} placeholder={". . . . . . . ."} onChange={inputOnchange}  ></InputBox>
+            <InputBox value={UserData.confirmPassword} name={"confirmPassword"}
+            onKeyDown={(e)=>{
                 if(e.key === "Enter") {
                     register() ;
                 }
             }}
-            label={'Confirm'} type={"password"} placeholder={". . . . . . . ."} onChange={(e) => {
-                setConfirmPassword(e.target.value) ;
-            }} ></InputBox>
+            label={'Confirm'} type={"password"} placeholder={". . . . . . . ."} onChange={inputOnchange} ></InputBox>
             {!btnLoad ? <Button label={"Sign Up"} onClick={register} /> : <button class="btn">
   <span class="loading loading-spinner"></span>
   loading

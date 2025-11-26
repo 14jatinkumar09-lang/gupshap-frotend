@@ -9,14 +9,18 @@ import { Signup } from '../pages/Signup.jsx' ;
 import { Home } from '../pages/Home.jsx'
 
 import { RecoilRoot } from "recoil";
-
+import { Provider } from 'react-redux';
+import { store } from '../redux.store/store/store.js';
 
 
 createRoot(document.getElementById('root')).render(
   
 <RecoilRoot >
     <BrowserRouter>
+<Provider store={store}>
     <App />
+
+</Provider>
     </BrowserRouter>
 </RecoilRoot>
 
