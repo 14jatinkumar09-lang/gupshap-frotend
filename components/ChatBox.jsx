@@ -1,4 +1,4 @@
-import { useEffect, useState ,useRef } from 'react';
+import { useEffect, useState ,useRef, useCallback, useLayoutEffect } from 'react';
 import { UserCard } from "./UserCard";
 import { IoSend } from "react-icons/io5";
 
@@ -9,11 +9,13 @@ import { useNavigate } from 'react-router-dom';
 import dayjs from "dayjs";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMessages, sendMessages } from '../redux.store/slice/msgSlice/slice.message.thunk';
-import { setChats } from '../redux.store/slice/msgSlice/slice.message';
+import { resetPage, setChats } from '../redux.store/slice/msgSlice/slice.message';
 
 
-export function ChatBox({ user }) {
+export function ChatBox( user ) {
+    console.log("top",user);
     const messageRef = useRef(null) ;
+    const chatBox = useRef(null) ;
     // const selectedUser = useRecoilValue(current_2nd_user);
     // const [chats,setChats] = useRecoilState(allChats) ;
     const [msgInput,setMsgInput] = useState('') ;
@@ -24,19 +26,50 @@ export function ChatBox({ user }) {
     const dispatch = useDispatch() ;
     
 
-    const  { chats } = useSelector(state => state.message)  
+    const  { chats,page } = useSelector(state => state.message)  
     const  chatsLoading  = useSelector(state => state.message.loading)  
     const { allFriendUsers , loading , filterSearchUsers , loginUser , homePageLoader , selectedUser } = useSelector(state => state.user) ;
     
-    
-    
+
     
     useEffect(()=>{
-        if(messageRef.current) {
-            messageRef.current.scrollIntoView({ behavior : "smooth"}) ;
+
+        messageRef?.current?.scrollIntoView({ block : "end"}) ;
+
+    } , [selectedUser]) ;
+    useEffect(()=>{
+
+        messageRef?.current?.scrollIntoView({ behavior : "smooth"}) ;
+
+    } , [chats]) ;
+
+
+    const fetchOlderMsg = ()=> {
+        chatBox.current.addEventListener("scroll", async () => {
+        console.log("older function page : "  ,page);
+        if(!selectedUser) return ;
+         console.log("selectedUser in older function"  ,selectedUser);
+        const scrollTop = chatBox.current.scrollTop ;
+        if(scrollTop === 0) {
+            
+            
+            await dispatch(fetchMessages({selectedUser , page:page })).then(async (res)=>{
+                res.meta.requestStatus === "rejected" ? toast.error("Time Out Check , Internet Connection")  : null 
+            }) ;
+                        
         }
+    } );
+    }
+   
+    
+   useEffect(()=>{
+       ChatBox?.current?.addEventListener("scroll", fetchOlderMsg);
+       return () => {
         
-    }) ;
+        ChatBox?.current?.removeEventListener("scroll", fetchOlderMsg);
+    }
+   },[page,selectedUser])
+
 useEffect(()=>{
     inputRef.current.focus() ;
 },[])
@@ -58,9 +91,13 @@ useEffect(()=>{
                 }
 // console.log("selected user before dispatch" , selectedUser);
 
-                dispatch(sendMessages({msgInput , selectedUser})) ;
+                await dispatch(sendMessages({msgInput , selectedUser})).
+                then((res)=>{
+                    res?.meta?.requestStatus !== "fulfilled" ? toast.error("Not sent , check internet connection") :null ;;
+                }) ;
+                
                
-                // toast.error("Not sent , check internet connection") ;
+                
                 
                 inputRef.current.focus() ;
                  
@@ -73,14 +110,19 @@ useEffect(()=>{
    
 
     return <div  className="flex flex-col justify-between h-full  ">
-        <div className= {` ${!selectedUser?._id ? "hidden" : "1" } border border-white/10 flex gap-2`} >
+        <div className= {` ${!selectedUser?._id ? "hidden" : "1" } border border-white/10 flex gap-2 `} >
 
             <UserCard onClick={async()=>{
                 // console.log("clicked");
                 if(Object.keys(selectedUser).length) {
                     navigate('/profile') ;
                 }
-            }} user={selectedUser} />
+            }} user={selectedUser} /><button onClick={()=>{
+
+                navigate(`/conference/${selectedUser?.fullName}`)
+            }}
+            >call</button>
+            
         </div>
 
         {!selectedUser?._id ? <div className=' h-full flex flex-col items-center justify-end p-5'> 
@@ -88,7 +130,8 @@ useEffect(()=>{
         <div>Select a User to continue..</div> 
         </div> : <></>}
 
-        <div className='flex flex-col justify-start overflow-y-scroll'>
+        <div ref={chatBox}
+        className='flex flex-col justify-start overflow-y-scroll'>
 
 
 

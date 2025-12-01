@@ -6,15 +6,16 @@ import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from 'react' ;
 import axios from 'axios' ;
 import toast, { Toaster } from 'react-hot-toast';
-import { socketio } from "../store/ConversationUser";
+// import { socketio } from "../store/ConversationUser";
 import { createSocket } from "../src/socket.js"
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-
+import { login } from '../redux.store/slice/userSlice/slice.user.thunk.js';
 
 export function Login () {
-    const [btnLoad , setBtnLoad] = useState(false) ;
-
+    // const [btnLoad , setBtnLoad] = useState(false) 
+    const btnLoad = useSelector(state => state.user.loading) ;
+    const dispatch = useDispatch() ;
     const [userData , setUserData] = useState({
         userName : "" ,
         password : ""
@@ -40,35 +41,22 @@ export function Login () {
 // },[btnLoad]) ;
 
     // const setSocket = useSetRecoilState(socketio);
-    const login = async()=>{
+    const loginUser = async()=>{
         if(userData.userName==="" || userData.password==="") {
             toast("enter user / password")
             return ;
         }
-                    try {
-                        setBtnLoad(true)  ;
+                    const res = await dispatch(login(userData)) ;
+                    console.log(res);
+                    if(res.meta.requestStatus === "fulfilled") {
 
-                        const res =  await axios.post( `${import.meta.env.VITE_URL}/user/login` , userData)
                         toast.success("logged in ")
-                        localStorage.setItem("_id" , res.data.responseData.userExist._id) ;
-                        
-                        
-                        
-    //                  const s = createSocket(!localStorage.getItem("_id"));
-    // setSocket(s);
-
-                        
                         navigate('/home') ;
-                       setBtnLoad(false) ; 
-                        localStorage.setItem("token" , res.data.responseData.token) ;
-                    } catch (error) {
-                        
-                        
-                        setBtnLoad(false) ; 
-                        
-                        toast.error(error?.response?.data?.errMessage || "Login Failed Check your Internet Connection") ;
-
                     }
+                    else {
+                        toast.error(res.error.message || "Login Failed Check your Internet Connection") ;
+                    }
+
                 }
     // useEffect(()=>{
     //     if(!localStorage.getItem("token")) return ;
@@ -100,7 +88,7 @@ return <div className="flex justify-center p-10">
                 <div className="m-6">
                     
         { !btnLoad ? <button className={` border w-full rounded-md py-2 text-white bg-blue-500 hover:cursor-pointer`}
-           onClick={login} >
+           onClick={loginUser} >
             Login
 
         </button> : 

@@ -1,19 +1,22 @@
-import { useRecoilState, useRecoilValue } from "recoil";
+// import { useRecoilState, useRecoilValue } from "recoil";
 import { Button } from "../components/Button";
 import { InputBox } from "../components/InputBox";
-import { current_2nd_user, loggedInUser } from "../store/ConversationUser";
+// import { current_2nd_user, loggedInUser } from "../store/ConversationUser";
+import { selectUser , setOnlineUsers } from "../redux.store/slice/userSlice/slice.user.js";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 export function Profile({user}) {
-const [selectedUser , setSelectedUser] = useRecoilState(current_2nd_user)
-    const [loginUser,setLoginUser] = useRecoilState(loggedInUser) ;
-    const [userName , setUserNameInput] = useState("") ;
-    const [fullName , setFullNameInput]  = useState("") ;
+// const [selectedUser , setSelectedUser] = useRecoilState(current_2nd_user)
+const {selectedUser }= useSelector(state => state.user) ;
+const dispatch = useDispatch() ;    // const [loginUser,setLoginUser] = useRecoilState(loggedInUser) ;
+    // const [userName , setUserNameInput] = useState("") ;
+    // const [fullName , setFullNameInput]  = useState("") ;
 
     useEffect(()=>{
         return ()=>{
-            setSelectedUser() ;
+            dispatch(selectUser({})) ;
         }
     } ,[])
 

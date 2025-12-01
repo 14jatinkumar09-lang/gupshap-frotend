@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchFilterUsers, fetchFriendUsers, fetchLoginUser } from "../redux.store/slice/userSlice/slice.user.thunk.js";
 import { selectUser , setOnlineUsers } from "../redux.store/slice/userSlice/slice.user.js";
 import { fetchMessages } from "../redux.store/slice/msgSlice/slice.message.thunk.js";
-import { setChats } from "../redux.store/slice/msgSlice/slice.message.js";
+import { resetPage, setChats, setChatsEmpty } from "../redux.store/slice/msgSlice/slice.message.js";
 
 
 export function Home() {
@@ -255,15 +255,24 @@ return !homePageLoader ? <div className="flex flex-col items-center sm:flex-row 
                 {!loading ? (userSearch  ? filterSearchUsers : allFriendUsers)?.map((user) => {
                         if(user._id === loginUser._id) return ;
                     
-                    return  <UserCard key={user?._id} user={user} onClick={() => { 
+                    return  <UserCard key={user?._id} user={user} onClick={async() => { 
                         if(selectedUser?._id === user?._id) return ;
-                        dispatch(selectUser(user)) ;
+                        await dispatch(setChatsEmpty());
+                      dispatch(resetPage(2)) ;
+                        // if (!selectedUser) return; 
+                        await dispatch(fetchMessages({selectedUser:user})).then((res)=>{
+                          res.meta.requestStatus === "rejected" ? toast.error("Time Out Check , Internet Connection")  :null
+                        }) ;
+                        await dispatch(selectUser(user)) ;
+                        console.log("homepage" ,selectedUser);
                         // console.log("selected user",user);
-                        if(!selectUser)return  ;
-                        dispatch(fetchMessages(user)) ;
-                    }} /> 
+                        // console.log(user);
+                        // console.log(selectedUser);
+                        
+                      }} /> 
+                      
+                    }) : <div className="flex justify-center"> <span className="loading loading-bars loading-xl"></span> </div> }
                     
-                }) : <div className="flex justify-center"> <span className="loading loading-bars loading-xl"></span> </div> }
             </div>
             <button className=" h-20 text-blue-300 text-center hidden gap-10 items-center px-5 hover:cursor-pointer sm:block sm:flex justify-center text-2xl font-bold" 
             onClick={()=>{

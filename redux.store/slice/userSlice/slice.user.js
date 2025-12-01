@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchFriendUsers , fetchFilterUsers , fetchLoginUser } from "./slice.user.thunk";
+import { fetchFriendUsers , fetchFilterUsers , fetchLoginUser, login } from "./slice.user.thunk";
 const userSlice = createSlice({
     name : "user" ,
     initialState : {
@@ -8,14 +8,14 @@ const userSlice = createSlice({
         allFriendUsers : [] ,
         loading : false ,
         filterSearchUsers : [] ,
-        selectedUser : {} ,
+        selectedUser : null ,
         filterSearchRedux : "" ,
         onlineUsers : []
 
     } ,
     reducers : {
         selectUser : (state,action)=>{
-            state.selectedUser = action.payload ;
+            state.selectedUser = { ...action.payload} ;
         } ,
         setOnlineUsers : (state , action )=>{
             state.onlineUsers = action.payload ;
@@ -32,8 +32,9 @@ const userSlice = createSlice({
             state.allFriendUsers = action.payload ;
             state.loading = false ;
         })
-        builder.addCase(fetchFriendUsers.rejected, (state, action) => {
+        builder.addCase(fetchFriendUsers.rejected, (state, action ) => {
             console.log("rejected");
+            
 state.loading = false ;
         })
 
@@ -79,8 +80,24 @@ builder.addCase(fetchLoginUser.pending, (state, action) => {
 state.homePageLoader = false ;
         })
 
+//////////////////////////////
 
 
+
+builder.addCase(login.pending, (state, action) => {
+            console.log("pending");
+            state.loading = true;
+
+        })
+        builder.addCase(login.fulfilled, (state, action) => {
+            console.log("fullfiled");
+            state.loading = false ;
+   
+        })
+        builder.addCase(login.rejected, (state, action) => {
+            console.log("rejected");
+            state.loading = false ;
+        })
 
     }
 })

@@ -1,5 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios  from "axios";
+import toast, { Toaster } from 'react-hot-toast';
+
+
 export const fetchFriendUsers = createAsyncThunk('user/fetchFriendUsers' , 
     async () => {
             try {
@@ -58,5 +61,35 @@ export const fetchLoginUser = createAsyncThunk( 'user/loginuserFetch' ,
     }
 )
 
+
+export const login = createAsyncThunk( "user/login" , 
+    async(userData) => {
+         try {
+             
+             const res =  await axios.post( `${import.meta.env.VITE_URL}/user/login` , userData , { timeout:10000})
+                        // setBtnLoad(true)  ;
+             
+                        // toast.success("logged in ")
+                        localStorage.setItem("_id" , res.data.responseData.userExist._id) ;
+                        localStorage.setItem("token" , res.data.responseData.token) ;
+                        // navigate('/home') ;
+                        
+                        return res.data.responseData ;
+    //                  const s = createSocket(!localStorage.getItem("_id"));
+    // setSocket(s);
+
+                        
+                    //    setBtnLoad(false) ; 
+                    } catch (error) {
+                        throw new Error(error?.response?.data?.errMessage);
+                        
+                        // return error?.response?.data?.errMessage ;
+                        
+                        // setBtnLoad(false) ; 
+                        // toast.error(error?.response?.data?.errMessage || "Login Failed Check your Internet Connection") ;
+
+                    }
+    }
+)
 
 

@@ -1,7 +1,7 @@
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { Button } from "../components/Button";
 import { InputBox } from "../components/InputBox";
-import { btnLoading, current_2nd_user, loggedInUser } from "../store/ConversationUser";
+// import { btnLoading, current_2nd_user, loggedInUser } from "../store/ConversationUser";
 import toast, { Toaster } from "react-hot-toast";
 import { useEffect, useState } from "react";
 import axios from 'axios' ;
