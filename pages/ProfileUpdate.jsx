@@ -1,4 +1,4 @@
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+// import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { Button } from "../components/Button";
 import { InputBox } from "../components/InputBox";
 // import { btnLoading, current_2nd_user, loggedInUser } from "../store/ConversationUser";
@@ -24,7 +24,7 @@ export function ProfileUpdate () {
     const [fullName , setFullNameInput]  = useState("") ;
     const [avatar , setAvatar]  = useState("") ;
     const [details , setDetails] = useState({}) ;
-    const [btnLoad , setBtnLoad] = useRecoilState(btnLoading) ;
+    const [btnLoad , setBtnLoad] = useState(false) ;
 
 
     const { allFriendUsers , loading , filterSearchUsers , loginUser , homePageLoader , selectedUser , onlineUsers } = useSelector(state => state.user) ;
