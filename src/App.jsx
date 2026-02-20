@@ -20,8 +20,18 @@ import Conference from '../pages/Conference.jsx';
 import { useSelector } from 'react-redux';
 
 
+
 function App() {
  const {selectedUser} = useSelector(state => state.user) ;
+
+const navigate = useNavigate() ;
+
+ useEffect(()=>{
+  if(!localStorage.getItem("token")) {
+    navigate("/login") ;
+  }
+},[]) ;
+
 
   return <div>
 

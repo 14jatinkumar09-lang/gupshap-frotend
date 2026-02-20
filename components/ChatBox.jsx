@@ -117,11 +117,7 @@ useEffect(()=>{
                 if(Object.keys(selectedUser).length) {
                     navigate('/profile') ;
                 }
-            }} user={selectedUser} /><button onClick={()=>{
-
-                navigate(`/conference/${selectedUser?.fullName}`)
-            }}
-            >call</button>
+            }} user={selectedUser} />
             
         </div>
 
