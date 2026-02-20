@@ -28,8 +28,11 @@ const navigate = useNavigate() ;
 
  useEffect(()=>{
   if(!localStorage.getItem("token")) {
-    navigate("/login") ;
+   return navigate("/login") ;
+  }else {
+  navigate("/home") ;
   }
+
 },[]) ;
 
 
