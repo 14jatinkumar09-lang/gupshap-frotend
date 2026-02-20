@@ -30,9 +30,14 @@ const navigate = useNavigate() ;
   if(!localStorage.getItem("token")) {
     navigate("/login") ;
   }
+<<<<<<< HEAD
 },[]) ;
 
 
+=======
+},[])
+ 
+>>>>>>> cda3d33d349877b1fd35e05e5f9f8ed0d361ef7e
   return <div>
 
 
