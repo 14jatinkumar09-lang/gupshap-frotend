@@ -209,7 +209,7 @@ return !homePageLoader ? <div className="flex flex-col items-center sm:flex-row 
         <div className="part1 sm:h-screen sm:w-[35vw]  h-[50vh] w-[80vw] xl:w-[50vw] lg:w-[50vw]  md:w-[50vw] border-2 border-white/10 flex flex-col justify-between">
 
             <div className="bg-gray-600  h-10 flex  justify-center items-center font-bold">
-                <div>GupShap</div>
+                <div>Gup~Shap</div>
             </div>
             <div className=" h-10 w-full ">
                 <label className="input validator w-full ">
